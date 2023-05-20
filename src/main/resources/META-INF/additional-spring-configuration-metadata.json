@@ -1,0 +1,12 @@
+{"properties": [
+  {
+    "name": "paging.pageSize",
+    "type": "java.lang.String",
+    "description": "A description for 'paging.pageSize'"
+  },
+  {
+    "name": "paging.pageNo",
+    "type": "java.lang.String",
+    "description": "A description for 'paging.pageNo'"
+  }
+]}
