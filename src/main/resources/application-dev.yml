@@ -1,0 +1,7 @@
+paging:
+  pageNo: 0
+  pageSize: 10
+
+spring:
+  jpa:
+    show-sql: true
