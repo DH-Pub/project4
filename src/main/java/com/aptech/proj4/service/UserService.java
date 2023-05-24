@@ -7,9 +7,21 @@ import com.aptech.proj4.dto.UserDto;
 import com.aptech.proj4.model.User;
 
 public interface UserService {
-    UserDto signup(UserDto user);
     UserDto createAdmin(UserDto user);
+
+    UserDto changeAdminRole(UserDto user);
+
+    UserDto signup(UserDto user);
+
     UserDto login(LoginRequest loginDto);
+
+    UserDto getUser(String id);
+
+    UserDto updateUser(UserDto user);
+
+    boolean changePassword(UserDto user);
+
+    boolean deleteUser(String id);
 
     UserDto findUserByEmail(String email);
 

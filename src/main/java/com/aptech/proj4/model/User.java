@@ -2,6 +2,8 @@ package com.aptech.proj4.model;
 
 import java.io.Serializable;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
@@ -41,9 +43,10 @@ public class User implements Serializable {
     @Column(name = "bio")
     private String bio;
 
-    @Column(name="pic")
+    @Column(name = "pic")
     private String pic;
 
-    @Column(name = "created_at")
-    private String created_at;
+    @CreationTimestamp
+    @Column(name = "created_at", columnDefinition = "DATETIME")
+    private String createdAt;
 }
