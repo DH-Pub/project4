@@ -1,6 +1,5 @@
 package com.aptech.proj4.service;
 
-import java.time.LocalTime;
 import java.util.List;
 import java.util.Optional;
 
@@ -28,7 +27,7 @@ public class UserServiceImpl implements UserService {
     public UserDto signup(UserDto userDto) {
         Optional<User> user = userRepository.findByEmail(userDto.getEmail());
         if (!user.isPresent()) {
-            // TODO complete generate id and add picture
+            // TODO complete and add picture
             User newUser = new User()
                     .setId(Long.toString(System.currentTimeMillis()))
                     .setEmail(userDto.getEmail())
@@ -40,6 +39,8 @@ public class UserServiceImpl implements UserService {
                     ;
             userRepository.save(newUser);
             userDto.setPassword("");
+        } else{
+            throw new RuntimeException("email already exists.");
         }
         return userDto;
     }
@@ -52,20 +53,38 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findUserByEmail(String email) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'findUserByEmail'");
+        Optional<User> user = Optional.ofNullable(userRepository.findByEmail(email).get());
+        if (user.isPresent()) {
+            return modelMapper.map(user.get(), UserDto.class);
+        }
+        return null;
     }
 
     @Override
     public List<User> getAllUser() {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getAllUser'");
+        return (List<User>) userRepository.findAll();
     }
 
     @Override
-    public UserDto createAdmin(UserDto user) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'createAdmin'");
+    public UserDto createAdmin(UserDto userDto) {
+        Optional<User> user = userRepository.findByEmail(userDto.getEmail());
+        if (!user.isPresent()) {
+            // TODO complete and add picture
+            User newUser = new User()
+                    .setId(Long.toString(System.currentTimeMillis()))
+                    .setEmail(userDto.getEmail())
+                    .setUsername(userDto.getUsername())
+                    .setPassword(passwordEncoder.encode(userDto.getPassword()))
+                    .setRole(UserRole.ADMIN)
+                    .setBio(userDto.getBio())
+                    // .setPic(null)
+                    ;
+            userRepository.save(newUser);
+            userDto.setPassword("");
+        } else{
+            throw new RuntimeException("email already exists.");
+        }
+        return userDto;
     }
 
     @Override

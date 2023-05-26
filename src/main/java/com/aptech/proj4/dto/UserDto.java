@@ -20,4 +20,6 @@ public class UserDto {
     private String bio;
     private String pic;
     private String create_at;
+
+    private String res_message;
 }

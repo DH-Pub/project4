@@ -36,6 +36,7 @@ public class JwtUtils {
         List<String> roles = new ArrayList<>();
         user.getAuthorities().stream().forEach(authority -> roles.add(authority.getAuthority()));
         claims.put("roles", roles);
+        
         String token = Jwts.builder().setClaims(claims)
                 .setExpiration(new Date(System.currentTimeMillis() + TOKEN_EXPERITION_TIME))
                 .signWith(SignatureAlgorithm.HS512, SECRET).compact();

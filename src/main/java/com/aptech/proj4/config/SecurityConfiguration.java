@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Configuration;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.authentication.configuration.AuthenticationConfiguration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -25,6 +26,7 @@ import jakarta.servlet.http.HttpServletResponse;
 
 @Configuration
 @EnableWebSecurity
+@EnableMethodSecurity
 public class SecurityConfiguration {
     @Autowired
     JwtUtils jwtUtils;
@@ -53,24 +55,35 @@ public class SecurityConfiguration {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager)
             throws Exception {
+        // http
+        //         .cors(withDefaults()).csrf(csrf -> csrf.disable())
+        //         .authorizeHttpRequests(authorize -> {
+        //             try {
+        //                 authorize
+        //                         .requestMatchers(ENDPOINTS_WHITELIST).permitAll()
+        //                         .anyRequest().authenticated().and()
+        //                         .exceptionHandling(handling -> handling.authenticationEntryPoint(
+        //                                 (req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
+        //                         .addFilter(new JwtAuthenticationFilter(authenticationManager, jwtUtils))
+        //                         .addFilter(new JwtAuthorizationFilter(authenticationManager));
+        //             } catch (Exception e) {
+        //                 e.printStackTrace();
+        //             }
+        //         }).sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+
         http
                 .cors(withDefaults()).csrf(csrf -> csrf.disable())
-                .authorizeHttpRequests(authorize -> {
-                    try {
-                        authorize
-                                .requestMatchers(ENDPOINTS_WHITELIST).permitAll()
-                                .anyRequest().authenticated().and()
-                                .exceptionHandling(handling -> handling.authenticationEntryPoint(
-                                        (req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
-                                .addFilter(new JwtAuthenticationFilter(authenticationManager, jwtUtils))
-                                .addFilter(new JwtAuthorizationFilter(authenticationManager));
-                    } catch (Exception e) {
-                        e.printStackTrace();
-                    }
-                }).sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+                .authorizeHttpRequests(authorize -> authorize
+                        .requestMatchers(ENDPOINTS_WHITELIST).permitAll()
+                        .anyRequest().authenticated())
+                .exceptionHandling(handling -> handling.authenticationEntryPoint(
+                        (req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
+                .addFilter(new JwtAuthenticationFilter(authenticationManager, jwtUtils))
+                .addFilter(new JwtAuthorizationFilter(authenticationManager))
+                .sessionManagement(session -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
         return http.build();
     }
-    
+
     @Bean
     CorsConfigurationSource corsConfigurationSource() {
         CorsConfiguration configuration = new CorsConfiguration();
