@@ -19,46 +19,46 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilter {
-    private final AuthenticationManager authenticationManager;
-    private JwtUtils jwtUtils;
+  private final AuthenticationManager authenticationManager;
+  private JwtUtils jwtUtils;
 
-    public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
-        this.authenticationManager = authenticationManager;
-        this.jwtUtils = jwtUtils;
-        this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/auth/login", "POST"));
+  public JwtAuthenticationFilter(AuthenticationManager authenticationManager, JwtUtils jwtUtils) {
+    this.authenticationManager = authenticationManager;
+    this.jwtUtils = jwtUtils;
+    this.setRequiresAuthenticationRequestMatcher(new AntPathRequestMatcher("/auth/login", "POST"));
+  }
+
+  @Override
+  public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res)
+      throws AuthenticationException {
+    try {
+
+      LoginRequest user = new ObjectMapper().readValue(req.getInputStream(), LoginRequest.class);
+      return authenticationManager.authenticate(
+          (new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(),
+              new ArrayList<>())));
+
+    } catch (Exception e) {
+      throw new RuntimeException(e.getMessage());
     }
 
-    @Override
-    public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res)
-            throws AuthenticationException {
-        try {
+  }
 
-            LoginRequest user = new ObjectMapper().readValue(req.getInputStream(), LoginRequest.class);
-            return authenticationManager.authenticate(
-                    (new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(),
-                            new ArrayList<>())));
+  @Override
+  protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain,
+      Authentication auth) throws IOException {
 
-        } catch (Exception e) {
-            throw new RuntimeException(e.getMessage());
-        }
+    if (auth.getPrincipal() != null) {
+      org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) auth
+          .getPrincipal();
+      String login = user.getUsername();
+      if (login != null && login.length() > 0) {
 
+        String accessTokenJson = new ObjectMapper().writeValueAsString(jwtUtils.generateToken(auth));
+        res.setContentType("application/json");
+        res.getWriter().write(accessTokenJson);
+
+      }
     }
-
-    @Override
-    protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain,
-            Authentication auth) throws IOException {
-
-        if (auth.getPrincipal() != null) {
-            org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) auth
-                    .getPrincipal();
-            String login = user.getUsername();
-            if (login != null && login.length() > 0) {
-
-                String accessTokenJson = new ObjectMapper().writeValueAsString(jwtUtils.generateToken(auth));
-                res.setContentType("application/json");
-                res.getWriter().write(accessTokenJson);
-
-            }
-        }
-    }
+  }
 }
