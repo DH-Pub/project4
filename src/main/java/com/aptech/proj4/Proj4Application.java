@@ -9,6 +9,7 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
+import com.aptech.proj4.config.SecurityConstants;
 import com.aptech.proj4.model.User;
 import com.aptech.proj4.model.UserRole;
 import com.aptech.proj4.repository.UserRepository;
@@ -31,13 +32,13 @@ public class Proj4Application {
 	@Bean
 	CommandLineRunner init(UserRepository userRepository){
 		return args ->{
-			Optional<User> admin = userRepository.findByEmail("main@email.com");
+			Optional<User> admin = userRepository.findByEmail(SecurityConstants.MAIN_EMAIL);
 			if (!admin.isPresent()){
 				User user = new User()
 				.setId("MainAdmin")
-				.setEmail("main@email.com")
+				.setEmail(SecurityConstants.MAIN_EMAIL)
 				.setUsername("Main Admin")
-				.setPassword(passwordEncoder.encode("password"))
+				.setPassword(passwordEncoder.encode(SecurityConstants.MAIN_PASSWORD))
 				.setRole(UserRole.MAIN)
 				.setBio("This is the Main Admin")
 				.setPic(null);

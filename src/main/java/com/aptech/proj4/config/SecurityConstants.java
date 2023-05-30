@@ -7,4 +7,7 @@ public interface SecurityConstants {
     String SIGN_UP_URL = "/users/sign-up";
     long TOKEN_EXPERITION_TIME = 300_000;
     long REFRESH_TOKEN_EXPIRATION_TIME = 432_000_000;
+
+    String MAIN_EMAIL = "main@email.com";
+    String MAIN_PASSWORD = "password";
 }
