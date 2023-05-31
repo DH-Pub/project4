@@ -10,6 +10,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import com.aptech.proj4.config.SecurityConstants;
+import com.aptech.proj4.dto.PasswordDto;
 import com.aptech.proj4.dto.UserDto;
 import com.aptech.proj4.model.User;
 import com.aptech.proj4.model.UserRole;
@@ -58,7 +59,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public List<User> getAllUser() {
-        return (List<User>) userRepository.findAll();
+        List<User> users = (List<User>) userRepository.findAll();
+        users.stream().forEach(u -> u.setPassword(null));
+        return (List<User>) users;
     }
 
     @Override
@@ -76,7 +79,7 @@ public class UserServiceImpl implements UserService {
             newUser.setPic(pic);
             userRepository.save(newUser);
 
-            userDto.setPassword("");
+            userDto.setPassword(null);
             userDto.setPic(pic);
             return userDto;
         } else {
@@ -86,7 +89,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean changeAdminRole(UserDto userDto) {
-        if(userDto.getEmail() == SecurityConstants.MAIN_EMAIL){
+        if (userDto.getEmail() == SecurityConstants.MAIN_EMAIL) {
             return false;
         }
         User user = userRepository.findByEmail(userDto.getEmail())
@@ -100,6 +103,7 @@ public class UserServiceImpl implements UserService {
     public UserDto getUser(String id) {
         Optional<User> user = Optional.ofNullable(userRepository.findById(id).get());
         if (user.isPresent()) {
+            user.get().setPassword(null);
             return modelMapper.map(user.get(), UserDto.class);
         }
         throw new RuntimeException("User does not exist.");
@@ -107,14 +111,21 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto updateUser(UserDto user) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'updateUser'");
+        User updatedUser = modelMapper.map(user, User.class);
+        userRepository.save(updatedUser);
+        return user;
     }
 
     @Override
-    public boolean changePassword(UserDto user) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'changePassword'");
+    public boolean changePassword(UserDto userDto, PasswordDto passwordDto) {
+        User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() -> new NoSuchElementException("Email not found."));
+        if (passwordEncoder.matches(passwordDto.getOldPassword(), user.getPassword())) {
+            user.setPassword(passwordEncoder.encode(passwordDto.getNewPassword()));
+            userRepository.save(user);
+        }else{
+            throw new RuntimeException("Wrong password.");
+        }
+        return true;
     }
 
     @Override

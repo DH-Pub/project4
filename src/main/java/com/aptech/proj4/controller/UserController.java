@@ -1,16 +1,21 @@
 package com.aptech.proj4.controller;
 
 import java.io.IOException;
+import java.util.Collection;
+import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -18,10 +23,13 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
-import com.aptech.proj4.config.FileUploadUtil;
+import com.aptech.proj4.dto.PasswordDto;
 import com.aptech.proj4.dto.UserDto;
+import com.aptech.proj4.model.User;
+import com.aptech.proj4.model.UserRole;
 import com.aptech.proj4.service.RefreshTokenService;
 import com.aptech.proj4.service.UserService;
+import com.aptech.proj4.utils.FileUploadUtil;
 import com.aptech.proj4.utils.JwtUtils;
 
 @RestController
@@ -59,18 +67,6 @@ public class UserController {
         }
     }
 
-    // @PostMapping("/create-admin")
-    // public ResponseEntity<UserDto> createAdmin(@RequestBody UserDto userDto,
-    // Authentication authentication) {
-    // Collection<? extends GrantedAuthority> authorities =
-    // authentication.getAuthorities();
-    // if (authorities.stream().anyMatch(role ->
-    // role.getAuthority().equals(UserRole.MAIN.toString()))) {
-    // return ResponseEntity.ok(userService.createAdmin(userDto));
-    // }
-    // return ResponseEntity.badRequest().build();
-    // }
-
     @PostMapping(path = "/create-admin", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     @PreAuthorize("hasAnyAuthority('MAIN', 'ADMIN')")
     public ResponseEntity<?> createAdmin(
@@ -100,7 +96,8 @@ public class UserController {
     @GetMapping("/all-users")
     @PreAuthorize("hasAnyAuthority('MAIN', 'ADMIN')")
     public ResponseEntity<?> getAllUser() {
-        return ResponseEntity.ok(userService.getAllUser());
+        List<User> users = userService.getAllUser();
+        return ResponseEntity.ok(users);
     }
 
     @PostMapping("/admin-role")
@@ -110,11 +107,60 @@ public class UserController {
     }
 
     @GetMapping("/user/{id}")
-    public ResponseEntity<?> getUser(@PathVariable String id) {
+    public ResponseEntity<?> getUser(@PathVariable String id, Authentication authentication) {
         try {
-            return ResponseEntity.ok(userService.getUser(id));
+            String checkingEmail = authentication.getPrincipal().toString();
+            UserDto checkingUser = userService.findUserByEmail(checkingEmail);
+            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+
+            UserDto user = new UserDto();
+            // check if user's own account or ADMIN or MAIN
+            if (checkingUser.getId().equals(id)
+                    || authorities.stream()
+                            .anyMatch(role -> role.getAuthority().equals(UserRole.MAIN.toString())
+                                    || role.getAuthority().equals(UserRole.ADMIN.toString()))) {
+                user = userService.getUser(id);
+                return ResponseEntity.ok(user);
+            }
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("You do not have permission to access this page.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("User does not exist.");
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PutMapping(path = "/user/update", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
+    public ResponseEntity<?> updateUser(
+            Authentication authentication,
+            @RequestParam(value = "image", required = false) MultipartFile image,
+            @RequestPart(value = "user") UserDto userDto) {
+        try {
+            UserDto user = userService.findUserByEmail(authentication.getPrincipal().toString());
+            user.setUsername(userDto.getUsername())
+                    .setBio(userDto.getBio());
+
+            UserDto result = new UserDto();
+            if (image != null) {
+                user.setPic(user.getId() + ".jpg");
+                result = userService.updateUser(user);
+                String uploadDir = "imgs/user-pp/";
+                FileUploadUtil.saveFile(uploadDir, result.getPic(), image);
+            } else {
+                result = userService.updateUser(user);
+            }
+            return ResponseEntity.ok(result);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @PutMapping("user/change-password")
+    public ResponseEntity<?> changePassword(@RequestBody PasswordDto passwordDto, Authentication authentication) {
+        UserDto userDto = new UserDto().setEmail(authentication.getPrincipal().toString());
+        try {
+            return ResponseEntity.ok(userService.changePassword(userDto, passwordDto));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 }

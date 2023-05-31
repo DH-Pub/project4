@@ -1,4 +1,4 @@
-package com.aptech.proj4.config;
+package com.aptech.proj4.utils;
 
 import java.io.IOException;
 import java.io.InputStream;
