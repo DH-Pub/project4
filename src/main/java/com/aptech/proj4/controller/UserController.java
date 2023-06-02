@@ -44,7 +44,7 @@ public class UserController {
 
     @PostMapping(path = "/signup", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     public ResponseEntity<?> signup(
-            @RequestParam(value = "image", required = false) MultipartFile image,
+            @RequestPart(value = "image", required = false) MultipartFile image,
             @RequestPart(value = "user") UserDto userDto) {
         try {
             UserDto user = new UserDto();
@@ -70,7 +70,7 @@ public class UserController {
     @PostMapping(path = "/create-admin", consumes = { MediaType.MULTIPART_FORM_DATA_VALUE })
     @PreAuthorize("hasAnyAuthority('MAIN', 'ADMIN')")
     public ResponseEntity<?> createAdmin(
-            @RequestParam(value = "image", required = false) MultipartFile image,
+            @RequestPart(value = "image", required = false) MultipartFile image,
             @RequestPart(value = "user") UserDto userDto) {
         try {
             UserDto admin = new UserDto();

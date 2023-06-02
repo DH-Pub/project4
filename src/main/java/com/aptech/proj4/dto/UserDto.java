@@ -19,5 +19,5 @@ public class UserDto {
     private String role;
     private String bio;
     private String pic;
-    private String create_at;
+    private String createAt;
 }
