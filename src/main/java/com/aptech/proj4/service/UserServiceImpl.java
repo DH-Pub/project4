@@ -130,8 +130,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean deleteUser(String id) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'deleteUser'");
+        User user = userRepository.findById(id).orElseThrow(()-> new NoSuchElementException("User id not found."));
+        if(user.getRole() == UserRole.MAIN){
+            return false;
+        }
+        userRepository.delete(user);
+        return true;
     }
 
 }

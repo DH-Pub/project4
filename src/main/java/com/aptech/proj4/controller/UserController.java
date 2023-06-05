@@ -12,6 +12,7 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -161,6 +162,16 @@ public class UserController {
             return ResponseEntity.ok(userService.changePassword(userDto, passwordDto));
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("user/delete/{id}")
+    @PreAuthorize("hasAnyAuthority('MAIN', 'ADMIN')")
+    public ResponseEntity<?> deleteUser(@PathVariable String id, Authentication authentication){
+        try {
+            return ResponseEntity.ok(userService.deleteUser(id));
+        } catch (Exception e) {
+            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 }
