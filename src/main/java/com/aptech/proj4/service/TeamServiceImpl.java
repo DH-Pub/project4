@@ -96,6 +96,14 @@ public class TeamServiceImpl implements TeamService {
         Team team = teamRepository.findById(teamMemberDto.getTeamId())
                 .orElseThrow(() -> new NoSuchElementException("Team not found"));
         List<TeamMember> members = memberRepository.findByTeam(team);
+
+        // check if member is already added
+        boolean memberInTeam = members.stream().filter(m -> m.getUser().getId().equals(teamMemberDto.getUserId()))
+                .findFirst().isPresent();
+        if (memberInTeam) {
+            throw new RuntimeException("This member is already in the team");
+        }
+
         User addingUser = userRepository.findByEmail(addingUserEmail)
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
@@ -171,7 +179,7 @@ public class TeamServiceImpl implements TeamService {
     public TeamMemberDto changeMemberRole(TeamMemberDto teamMemberDto) {
         TeamMember teamMember = memberRepository.findById(teamMemberDto.getId())
                 .orElseThrow(() -> new NoSuchElementException("TeamMember not found"));
-        if(teamMember.getRole().equals(TeamMemberRole.CREATOR)){
+        if (teamMember.getRole().equals(TeamMemberRole.CREATOR)) {
             throw new RuntimeException("This member role cannot be changed");
         }
         teamMember.setRole(TeamMemberRole.valueOf(teamMemberDto.getRole()));
