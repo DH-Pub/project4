@@ -4,19 +4,30 @@ import java.util.List;
 
 import com.aptech.proj4.dto.TeamDto;
 import com.aptech.proj4.dto.TeamMemberDto;
+import com.aptech.proj4.dto.UserDto;
+import com.aptech.proj4.model.Team;
+import com.aptech.proj4.model.TeamMember;
 
 public interface TeamService {
     TeamDto createTeam(TeamDto team, String creatingUser);
 
     TeamDto getTeam(String id);
 
-    List<TeamDto> getAllTeams();
+    List<Team> getAllTeams();
 
     TeamDto updateTeam(TeamDto team);
 
-    boolean deleteTeam(TeamDto team);
+    boolean deleteTeam(String id);
 
-    TeamMemberDto addMember(TeamMemberDto teamMemberDto);
+    TeamMemberDto addMember(TeamMemberDto teamMemberDto, String addingUserEmail);
 
-    TeamMemberDto removeMember(TeamMemberDto teamMemberDto);
+    boolean removeMember(long id);
+
+    List<UserDto> getAllMembersDetails(String teamId);
+
+    TeamMemberDto getMember(String memberUserId, String teamId);
+
+    List<TeamMember> getAllMembers(String teamId);
+
+    TeamMemberDto changeMemberRole(TeamMemberDto teamMemberDto);
 }

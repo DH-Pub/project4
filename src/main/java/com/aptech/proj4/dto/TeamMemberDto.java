@@ -13,9 +13,9 @@ import lombok.experimental.Accessors;
 @AllArgsConstructor
 public class TeamMemberDto {
     private long id;
-    private String user;
+    private String userId;
     private String addedBy;
-    private String team;
+    private String teamId;
     private String role;
     private String addedAt;
 }

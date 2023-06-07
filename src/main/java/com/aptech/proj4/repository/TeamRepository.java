@@ -7,6 +7,6 @@ import org.springframework.data.repository.CrudRepository;
 import com.aptech.proj4.model.Team;
 
 
-public interface TeamRepository extends CrudRepository<Team, Long> {
+public interface TeamRepository extends CrudRepository<Team, String> {
     Optional<Team> findById(String id);
 }
