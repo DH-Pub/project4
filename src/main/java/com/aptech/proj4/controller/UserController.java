@@ -25,13 +25,18 @@ import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.aptech.proj4.dto.PasswordDto;
+import com.aptech.proj4.dto.TokenRefreshDto;
 import com.aptech.proj4.dto.UserDto;
+import com.aptech.proj4.exception.TokenRefreshException;
+import com.aptech.proj4.model.RefreshToken;
 import com.aptech.proj4.model.User;
 import com.aptech.proj4.model.UserRole;
 import com.aptech.proj4.service.RefreshTokenService;
 import com.aptech.proj4.service.UserService;
 import com.aptech.proj4.utils.FileUploadUtil;
 import com.aptech.proj4.utils.JwtUtils;
+
+import jakarta.validation.Valid;
 
 @RestController
 @RequestMapping("/auth")
@@ -167,11 +172,23 @@ public class UserController {
 
     @DeleteMapping("user/delete/{id}")
     @PreAuthorize("hasAnyAuthority('MAIN', 'ADMIN')")
-    public ResponseEntity<?> deleteUser(@PathVariable String id, Authentication authentication){
+    public ResponseEntity<?> deleteUser(@PathVariable String id, Authentication authentication) {
         try {
             return ResponseEntity.ok(userService.deleteUser(id));
         } catch (Exception e) {
-            return  ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
+    }
+
+    @PostMapping("/refreshtoken")
+    public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshDto req) {
+        String requestRefreshToken = req.getRefreshToken();
+        return refreshTokenService.findByToken(requestRefreshToken)
+                .map(refreshTokenService::verifyExpiration)
+                .map(RefreshToken::getUser)
+                .map(user -> {
+                    return ResponseEntity.ok(jwtUtils.generateTokenFromEmail(user.getEmail()));
+                })
+                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!"));
     }
 }
