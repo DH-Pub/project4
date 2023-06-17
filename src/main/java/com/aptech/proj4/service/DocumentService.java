@@ -2,11 +2,13 @@ package com.aptech.proj4.service;
 
 import java.util.List;
 
+import org.springframework.web.multipart.MultipartFile;
+
 import com.aptech.proj4.dto.DocumentDto;
 import com.aptech.proj4.model.Document;
 
 public interface DocumentService {
-    DocumentDto createDocument(DocumentDto document);
+    DocumentDto createDocument(DocumentDto document, MultipartFile file);
 
     boolean deleteDocument(String id);
 
