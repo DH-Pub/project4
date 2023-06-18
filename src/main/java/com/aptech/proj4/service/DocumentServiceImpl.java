@@ -8,6 +8,7 @@ import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
@@ -28,6 +29,8 @@ public class DocumentServiceImpl implements DocumentService {
   DocumentRepository documentRepository;
   @Autowired
   ProjectRepository projectRepository;
+  @Autowired
+  private ModelMapper modelMapper;
 
   @Override
   public DocumentDto createDocument(DocumentDto documentDto, MultipartFile file) {
@@ -78,8 +81,11 @@ public class DocumentServiceImpl implements DocumentService {
 
   @Override
   public DocumentDto findFileByName(String file) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'findFileByName'");
+    Optional<Document> document = Optional.ofNullable(documentRepository.findByName(file).get());
+    if (document.isPresent()) {
+      return modelMapper.map(document.get(), DocumentDto.class);
+    }
+    throw new RuntimeException("Document name not found");
   }
 
   @Override
