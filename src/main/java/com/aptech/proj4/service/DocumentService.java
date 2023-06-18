@@ -2,6 +2,7 @@ package com.aptech.proj4.service;
 
 import java.util.List;
 
+import org.springframework.core.io.Resource;
 import org.springframework.web.multipart.MultipartFile;
 
 import com.aptech.proj4.dto.DocumentDto;
@@ -18,7 +19,7 @@ public interface DocumentService {
 
     List<Document> getAllDocuments();
 
-    /*
-     * TODO: add implement this
-     */
+    Resource loadDocumentFile(String fileId); // get Document from resource
+
+    String getDocumentFileUrl(String fileId); // create url for dowload
 }

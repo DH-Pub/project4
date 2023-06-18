@@ -1,14 +1,18 @@
 package com.aptech.proj4.service;
 
 import java.io.IOException;
+import java.net.MalformedURLException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.aptech.proj4.dto.DocumentDto;
 import com.aptech.proj4.model.Document;
@@ -90,6 +94,45 @@ public class DocumentServiceImpl implements DocumentService {
   public List<Document> getAllDocuments() {
     List<Document> documents = (List<Document>) documentRepository.findAll();
     return documents;
+  }
+
+  @Override
+  public Resource loadDocumentFile(String fileId) {
+    // Load the document from the database
+    Document document = documentRepository.findById(fileId)
+        .orElseThrow(() -> new NoSuchElementException("Document ID not found"));
+
+    // Get the file name
+    String fileName = document.getFiles();
+
+    try {
+      // Build the file path
+      String uploadDir = "upload directory"; // TODO: add Upload Directory later
+      String filePath = uploadDir + "/" + document.getId() + "-" + fileName;
+
+      // Load the file as a resource
+      Resource resource = new UrlResource(filePath);
+
+      // Check if the file exists and is readable
+      if (resource.exists() && resource.isReadable()) {
+        return resource;
+      } else {
+        throw new RuntimeException("Failed to load document file: " + fileName);
+      }
+    } catch (MalformedURLException e) {
+      throw new RuntimeException("Failed to load document file: " + fileName, e);
+    }
+  }
+
+  @Override
+  public String getDocumentFileUrl(String fileId) {
+    // Generate the download URL for the document file
+    String downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
+        .path("/documents/download/")
+        .path(fileId)
+        .toUriString();
+
+    return downloadUrl;
   }
 
 }
