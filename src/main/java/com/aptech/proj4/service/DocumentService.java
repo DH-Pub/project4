@@ -15,8 +15,6 @@ public interface DocumentService {
 
     DocumentDto findFileByName(String file); // use string `files`
 
-    String getCreatedAt(Document document); // get created time
-
     List<Document> getAllDocuments();
 
     Resource loadDocumentFile(String fileId); // get Document from resource

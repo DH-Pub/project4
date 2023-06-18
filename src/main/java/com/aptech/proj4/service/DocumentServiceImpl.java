@@ -2,6 +2,7 @@ package com.aptech.proj4.service;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -30,8 +31,7 @@ public class DocumentServiceImpl implements DocumentService {
 
   @Override
   public DocumentDto createDocument(DocumentDto documentDto, MultipartFile file) {
-    if (documentDto == null || documentDto.getDescription() == null ||
-        documentDto.getCreateAt() == null || documentDto.getProject_id() == null) {
+    if (documentDto == null || documentDto.getDescription() == null || documentDto.getProject_id() == null) {
       throw new IllegalArgumentException("Invalid documentDto");
     }
     // Random ID
@@ -44,7 +44,6 @@ public class DocumentServiceImpl implements DocumentService {
         .setId(documentId)
         .setDescription(documentDto.getDescription())
         .setFiles(file.getOriginalFilename())
-        .setCreatedAt(documentDto.getCreateAt())
         .setProject(project);
     Document savedDocument = documentRepository.save(document);
     // Check return value
@@ -65,7 +64,6 @@ public class DocumentServiceImpl implements DocumentService {
     savedDocumentDto.setDescription(savedDocument.getDescription());
     savedDocumentDto.setFiles(savedDocument.getFiles());
     savedDocumentDto.setProject_id(savedDocument.getProject().getId());
-    savedDocumentDto.setCreateAt(savedDocument.getCreatedAt());
 
     return savedDocumentDto;
   }
@@ -82,12 +80,6 @@ public class DocumentServiceImpl implements DocumentService {
   public DocumentDto findFileByName(String file) {
     // TODO Auto-generated method stub
     throw new UnsupportedOperationException("Unimplemented method 'findFileByName'");
-  }
-
-  @Override
-  public String getCreatedAt(Document document) {
-    // TODO Auto-generated method stub
-    throw new UnsupportedOperationException("Unimplemented method 'getCreatedAt'");
   }
 
   @Override
