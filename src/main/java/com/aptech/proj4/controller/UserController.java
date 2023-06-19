@@ -59,7 +59,7 @@ public class UserController {
                 userDto.setPic(fileName);
                 user = userService.signup(userDto);
 
-                String uploadDir = "imgs/user-pp/";
+                String uploadDir = "files/imgs/user-pp/";
                 FileUploadUtil.saveFile(uploadDir, user.getPic(), image);
             } else {
                 userDto.setPic(null);
@@ -85,7 +85,7 @@ public class UserController {
                 userDto.setPic(fileName);
                 admin = userService.createAdmin(userDto);
 
-                String uploadDir = "imgs/user-pp/";
+                String uploadDir = "files/imgs/user-pp/";
                 FileUploadUtil.saveFile(uploadDir, admin.getPic(), image);
             } else {
                 userDto.setPic(null);
@@ -149,7 +149,7 @@ public class UserController {
             if (image != null) {
                 user.setPic(user.getId() + ".jpg");
                 result = userService.updateUser(user);
-                String uploadDir = "imgs/user-pp/";
+                String uploadDir = "files/imgs/user-pp/";
                 FileUploadUtil.saveFile(uploadDir, result.getPic(), image);
             } else {
                 result = userService.updateUser(user);
