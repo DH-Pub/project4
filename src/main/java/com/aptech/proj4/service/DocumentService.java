@@ -10,7 +10,7 @@ import com.aptech.proj4.dto.ProjectDto;
 import com.aptech.proj4.model.Document;
 
 public interface DocumentService {
-    DocumentDto createDocument(DocumentDto document, ProjectDto projectDto, String authentication);
+    DocumentDto createDocument(DocumentDto document, ProjectDto projectDto);
 
     boolean deleteDocument(String id, String authentication);
 

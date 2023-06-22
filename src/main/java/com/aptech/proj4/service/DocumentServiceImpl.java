@@ -33,21 +33,20 @@ public class DocumentServiceImpl implements DocumentService {
   private ModelMapper modelMapper;
 
   @Override
-  public DocumentDto createDocument(DocumentDto documentDto, ProjectDto projectDto, String authentication) {
-    Optional<Project> project = projectRepository.findById(projectDto.getId());
-    if (project.isPresent()) {
-      Document newDocument = new Document()
-          .setId(Long.toString(System.currentTimeMillis()))
-          .setDescription(documentDto.getDescription());
-      String file = documentDto.getFiles() == null ? null : documentDto.getFiles();
-      newDocument.setFiles(file);
-      documentRepository.save(newDocument);
+  public DocumentDto createDocument(DocumentDto documentDto, ProjectDto projectDto) {
+    Project project = projectRepository.findById(projectDto.getId().toString())
+        .orElseThrow(() -> new RuntimeException("Project ID not found"));
 
-      documentDto.setFiles(file);
-      return documentDto;
-    } else {
-      throw new RuntimeException("Project ID not found");
-    }
+    Document newDocument = new Document()
+        .setId(Long.toString(System.currentTimeMillis()))
+        .setDescription(documentDto.getDescription());
+    String file = documentDto.getFiles() == null ? null : documentDto.getFiles();
+    newDocument.setFiles(file);
+    newDocument.setProject(project);
+    documentRepository.save(newDocument);
+
+    documentDto.setFiles(file);
+    return documentDto;
   }
 
   @Override

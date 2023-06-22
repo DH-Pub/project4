@@ -35,20 +35,19 @@ public class DocumentController {
   public ResponseEntity<?> createDocument(
       @RequestPart(value = "file", required = true) MultipartFile file,
       @RequestPart(value = "document") DocumentDto documentDto,
-      @RequestPart(value = "project_id") ProjectDto projectDto,
-      Authentication authentication) {
+      @RequestPart(value = "project") ProjectDto projectDto) {
     try {
       DocumentDto document = new DocumentDto();
       if (file != null) {
         String fileName = StringUtils.cleanPath(file.getOriginalFilename());
         documentDto.setFiles(fileName);
-        document = documentService.createDocument(documentDto, projectDto, authentication.getPrincipal().toString());
+        document = documentService.createDocument(documentDto, projectDto);
 
         String uploadDir = "documents/upload";
         FileUploadUtil.saveFile(uploadDir, document.getFiles(), file);
       } else {
         documentDto.setFiles(null);
-        document = documentService.createDocument(documentDto, projectDto, authentication.getPrincipal().toString());
+        document = documentService.createDocument(documentDto, projectDto);
       }
       return ResponseEntity.ok(document);
     } catch (RuntimeException e) {
