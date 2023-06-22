@@ -2,7 +2,6 @@ package com.aptech.proj4.service;
 
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -17,6 +16,7 @@ import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.aptech.proj4.dto.DocumentDto;
+import com.aptech.proj4.dto.ProjectDto;
 import com.aptech.proj4.model.Document;
 import com.aptech.proj4.model.Project;
 import com.aptech.proj4.repository.DocumentRepository;
@@ -33,69 +33,49 @@ public class DocumentServiceImpl implements DocumentService {
   private ModelMapper modelMapper;
 
   @Override
-  public DocumentDto createDocument(DocumentDto documentDto, MultipartFile file) {
-    if (documentDto == null || documentDto.getDescription() == null || documentDto.getProject_id() == null) {
-      throw new IllegalArgumentException("Invalid documentDto");
-    }
-    // Random ID
-    String documentId = UUID.randomUUID().toString();
-    // Find Project ID
-    Optional<Project> projectOptional = projectRepository.findById(documentDto.getProject_id());
-    Project project = projectOptional.orElseThrow(() -> new RuntimeException("Project not found"));
-    // Create and save Document
-    Document document = new Document()
-        .setId(documentId)
-        .setDescription(documentDto.getDescription())
-        .setFiles(file.getOriginalFilename())
-        .setProject(project);
-    Document savedDocument = documentRepository.save(document);
-    // Check return value
-    if (savedDocument == null) {
-      throw new RuntimeException("Failed to save document");
-    }
-    // Save the file
-    try {
-      String uploadDir = "upload directory"; // TODO: add Upload Directory later
-      String fileName = savedDocument.getId() + "-" + file.getOriginalFilename();
-      FileUploadUtil.saveFile(uploadDir, fileName, file);
-    } catch (IOException e) {
-      throw new RuntimeException("Failed to save file", e);
-    }
-    // Create documentDto
-    DocumentDto savedDocumentDto = new DocumentDto();
-    savedDocumentDto.setId(savedDocument.getId());
-    savedDocumentDto.setDescription(savedDocument.getDescription());
-    savedDocumentDto.setFiles(savedDocument.getFiles());
-    savedDocumentDto.setProject_id(savedDocument.getProject().getId());
+  public DocumentDto createDocument(DocumentDto documentDto, ProjectDto projectDto, String authentication) {
+    Optional<Project> project = projectRepository.findById(projectDto.getId());
+    if (project.isPresent()) {
+      Document newDocument = new Document()
+          .setId(Long.toString(System.currentTimeMillis()))
+          .setDescription(documentDto.getDescription());
+      String file = documentDto.getFiles() == null ? null : documentDto.getFiles();
+      newDocument.setFiles(file);
+      documentRepository.save(newDocument);
 
-    return savedDocumentDto;
+      documentDto.setFiles(file);
+      return documentDto;
+    } else {
+      throw new RuntimeException("Project ID not found");
+    }
   }
 
   @Override
-  public boolean deleteDocument(String id) {
+  public boolean deleteDocument(String id, String authentication) {
     Document document = documentRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException("Document ID not found"));
     documentRepository.delete(document);
     return true;
   }
 
-  @Override
-  public DocumentDto findFileByName(String file) {
-    Optional<Document> document = Optional.ofNullable(documentRepository.findByName(file).get());
-    if (document.isPresent()) {
-      return modelMapper.map(document.get(), DocumentDto.class);
-    }
-    throw new RuntimeException("Document name not found");
-  }
+  // @Override
+  // public DocumentDto findFileByName(String file) {
+  // Optional<Document> document =
+  // Optional.ofNullable(documentRepository.findByName(file).get());
+  // if (document.isPresent()) {
+  // return modelMapper.map(document.get(), DocumentDto.class);
+  // }
+  // throw new RuntimeException("Document name not found");
+  // }
 
   @Override
-  public List<Document> getAllDocuments() {
+  public List<Document> getAllDocuments(String authentication) {
     List<Document> documents = (List<Document>) documentRepository.findAll();
     return documents;
   }
 
   @Override
-  public Resource loadDocumentFile(String fileId) {
+  public Resource loadDocumentFile(String fileId, String authentication) {
     // Load the document from the database
     Document document = documentRepository.findById(fileId)
         .orElseThrow(() -> new NoSuchElementException("Document ID not found"));
@@ -123,7 +103,7 @@ public class DocumentServiceImpl implements DocumentService {
   }
 
   @Override
-  public String getDocumentFileUrl(String fileId) {
+  public String getDocumentFileUrl(String fileId, String authentication) {
     // Generate the download URL for the document file
     String downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
         .path("/documents/download/")

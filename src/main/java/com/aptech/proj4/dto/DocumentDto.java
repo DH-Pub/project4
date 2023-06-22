@@ -15,7 +15,6 @@ public class DocumentDto {
     private String id;
     private String description;
     private String files; // string for file name
-    private String password;
     private String project_id;
     private String createAt;
 }
