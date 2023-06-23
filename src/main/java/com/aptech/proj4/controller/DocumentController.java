@@ -8,7 +8,6 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.Authentication;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -58,10 +57,10 @@ public class DocumentController {
   }
 
   @DeleteMapping("/{id}")
-  public ResponseEntity<Void> deleteDocument(@PathVariable("id") String id, Authentication authentication) {
-    boolean deleted = documentService.deleteDocument(id, authentication.getPrincipal().toString());
+  public ResponseEntity<String> deleteDocument(@PathVariable("id") String id) {
+    boolean deleted = documentService.deleteDocument(id);
     if (deleted) {
-      return ResponseEntity.noContent().build();
+      return ResponseEntity.status(HttpStatus.OK).body("Document deleted successfully");
     } else {
       return ResponseEntity.notFound().build();
     }
@@ -75,17 +74,17 @@ public class DocumentController {
   // }
 
   @GetMapping
-  public ResponseEntity<List<Document>> getAllDocuments(Authentication authentication) {
-    List<Document> documents = documentService.getAllDocuments(authentication.getPrincipal().toString());
+  public ResponseEntity<List<Document>> getAllDocuments() {
+    List<Document> documents = documentService.getAllDocuments();
     return ResponseEntity.ok(documents);
   }
 
   @GetMapping("/download/{fileId}")
-  public ResponseEntity<Resource> downloadDocument(@PathVariable("fileId") String fileId,
-      Authentication authentication) {
-    Resource resource = documentService.loadDocumentFile(fileId, authentication.getPrincipal().toString());
+  public ResponseEntity<Resource> downloadDocument(@PathVariable("fileId") String fileId) {
+    Resource resource = documentService.loadDocumentFile(fileId);
     return ResponseEntity.ok()
         .header(HttpHeaders.CONTENT_DISPOSITION, "attachment; filename=\"" + resource.getFilename() + "\"")
         .body(resource);
   }
+
 }

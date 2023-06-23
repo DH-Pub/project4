@@ -1,18 +1,15 @@
 package com.aptech.proj4.service;
 
-import java.io.IOException;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.UUID;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.stereotype.Service;
-import org.springframework.web.multipart.MultipartFile;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
 
 import com.aptech.proj4.dto.DocumentDto;
@@ -21,7 +18,6 @@ import com.aptech.proj4.model.Document;
 import com.aptech.proj4.model.Project;
 import com.aptech.proj4.repository.DocumentRepository;
 import com.aptech.proj4.repository.ProjectRepository;
-import com.aptech.proj4.utils.FileUploadUtil;
 
 @Service
 public class DocumentServiceImpl implements DocumentService {
@@ -50,7 +46,7 @@ public class DocumentServiceImpl implements DocumentService {
   }
 
   @Override
-  public boolean deleteDocument(String id, String authentication) {
+  public boolean deleteDocument(String id) {
     Document document = documentRepository.findById(id)
         .orElseThrow(() -> new NoSuchElementException("Document ID not found"));
     documentRepository.delete(document);
@@ -68,47 +64,38 @@ public class DocumentServiceImpl implements DocumentService {
   // }
 
   @Override
-  public List<Document> getAllDocuments(String authentication) {
+  public List<Document> getAllDocuments() {
     List<Document> documents = (List<Document>) documentRepository.findAll();
     return documents;
   }
 
   @Override
-  public Resource loadDocumentFile(String fileId, String authentication) {
+  public Resource loadDocumentFile(String fileId) {
     // Load the document from the database
     Document document = documentRepository.findById(fileId)
         .orElseThrow(() -> new NoSuchElementException("Document ID not found"));
-
     // Get the file name
     String fileName = document.getFiles();
-
     try {
-      // Build the file path
-      String uploadDir = "upload directory"; // TODO: add Upload Directory later
-      String filePath = uploadDir + "/" + document.getId() + "-" + fileName;
-
-      // Load the file as a resource
-      Resource resource = new UrlResource(filePath);
-
-      // Check if the file exists and is readable
-      if (resource.exists() && resource.isReadable()) {
+      String uploadDir = "documents/upload/";
+      String filePath = uploadDir + fileName;
+      Resource resource = new FileSystemResource(filePath);
+      if (resource.exists()) {
         return resource;
       } else {
         throw new RuntimeException("Failed to load document file: " + fileName);
       }
-    } catch (MalformedURLException e) {
+    } catch (Exception e) {
       throw new RuntimeException("Failed to load document file: " + fileName, e);
     }
   }
 
   @Override
-  public String getDocumentFileUrl(String fileId, String authentication) {
-    // Generate the download URL for the document file
+  public String getDocumentFileUrl(String fileId) {
     String downloadUrl = ServletUriComponentsBuilder.fromCurrentContextPath()
         .path("/documents/download/")
         .path(fileId)
         .toUriString();
-
     return downloadUrl;
   }
 
