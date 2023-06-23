@@ -1,6 +1,7 @@
 package com.aptech.proj4.controller;
 
 import java.util.List;
+import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.Resource;
@@ -38,7 +39,9 @@ public class DocumentController {
     try {
       DocumentDto document = new DocumentDto();
       if (file != null) {
-        String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+        String originalFilename = file.getOriginalFilename();
+        String randomPrefix = UUID.randomUUID().toString(); // Random code
+        String fileName = randomPrefix + "_" + StringUtils.cleanPath(originalFilename);
         documentDto.setFiles(fileName);
         document = documentService.createDocument(documentDto, projectDto);
 
@@ -66,12 +69,11 @@ public class DocumentController {
     }
   }
 
-  // @GetMapping("/{file}")
-  // public ResponseEntity<DocumentDto> findFileByName(@PathVariable("file")
-  // String file) {
-  // DocumentDto documentDto = documentService.findFileByName(file);
-  // return ResponseEntity.ok(documentDto);
-  // }
+  @GetMapping("/{file}")
+  public ResponseEntity<DocumentDto> findFileByName(@PathVariable("file") String file) {
+    DocumentDto documentDto = documentService.findFileByName(file);
+    return ResponseEntity.ok(documentDto);
+  }
 
   @GetMapping
   public ResponseEntity<List<Document>> getAllDocuments() {

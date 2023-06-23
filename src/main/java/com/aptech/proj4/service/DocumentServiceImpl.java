@@ -3,6 +3,7 @@ package com.aptech.proj4.service;
 import java.net.MalformedURLException;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,15 +54,14 @@ public class DocumentServiceImpl implements DocumentService {
     return true;
   }
 
-  // @Override
-  // public DocumentDto findFileByName(String file) {
-  // Optional<Document> document =
-  // Optional.ofNullable(documentRepository.findByName(file).get());
-  // if (document.isPresent()) {
-  // return modelMapper.map(document.get(), DocumentDto.class);
-  // }
-  // throw new RuntimeException("Document name not found");
-  // }
+  @Override
+  public DocumentDto findFileByName(String file) {
+    Optional<Document> document = documentRepository.findByFilesContaining(file);
+    if (document.isPresent()) {
+      return modelMapper.map(document.get(), DocumentDto.class);
+    }
+    throw new RuntimeException("Document name not found");
+  }
 
   @Override
   public List<Document> getAllDocuments() {

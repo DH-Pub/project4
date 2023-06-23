@@ -7,5 +7,5 @@ import org.springframework.data.repository.CrudRepository;
 import com.aptech.proj4.model.Document;
 
 public interface DocumentRepository extends CrudRepository<Document, String> {
-    // Optional<Document> findByName(String files);
+    Optional<Document> findByFilesContaining(String files);
 }
