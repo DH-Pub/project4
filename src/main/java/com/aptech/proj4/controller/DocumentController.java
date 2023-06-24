@@ -70,9 +70,9 @@ public class DocumentController {
   }
 
   @GetMapping("/{file}")
-  public ResponseEntity<DocumentDto> findFileByName(@PathVariable("file") String file) {
-    DocumentDto documentDto = documentService.findFileByName(file);
-    return ResponseEntity.ok(documentDto);
+  public ResponseEntity<List<Document>> findFileByName(@PathVariable("file") String file) {
+    List<Document> document = documentService.findFilesByName(file);
+    return ResponseEntity.ok(document);
   }
 
   @GetMapping

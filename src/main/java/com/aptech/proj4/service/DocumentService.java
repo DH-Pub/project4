@@ -13,7 +13,7 @@ public interface DocumentService {
 
     boolean deleteDocument(String id);
 
-    DocumentDto findFileByName(String file); // use string `files`
+    List<Document> findFilesByName(String file); // use string `files`
 
     List<Document> getAllDocuments();
 

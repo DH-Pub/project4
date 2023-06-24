@@ -1,11 +1,11 @@
 package com.aptech.proj4.repository;
 
-import java.util.Optional;
+import java.util.List;
 
 import org.springframework.data.repository.CrudRepository;
 
 import com.aptech.proj4.model.Document;
 
 public interface DocumentRepository extends CrudRepository<Document, String> {
-    Optional<Document> findByFilesContaining(String files);
+    List<Document> findByFilesContaining(String files);
 }

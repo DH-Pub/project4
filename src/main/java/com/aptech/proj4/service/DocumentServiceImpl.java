@@ -4,6 +4,7 @@ import java.net.MalformedURLException;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -55,10 +56,10 @@ public class DocumentServiceImpl implements DocumentService {
   }
 
   @Override
-  public DocumentDto findFileByName(String file) {
-    Optional<Document> document = documentRepository.findByFilesContaining(file);
-    if (document.isPresent()) {
-      return modelMapper.map(document.get(), DocumentDto.class);
+  public List<Document> findFilesByName(String file) {
+    List<Document> documents = documentRepository.findByFilesContaining(file);
+    if (!documents.isEmpty()) {
+      return documents;
     }
     throw new RuntimeException("Document name not found");
   }
