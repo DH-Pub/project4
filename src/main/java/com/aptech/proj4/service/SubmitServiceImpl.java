@@ -6,6 +6,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
 import org.springframework.web.servlet.support.ServletUriComponentsBuilder;
+import org.springframework.stereotype.Service;
 
 import com.aptech.proj4.dto.SubmitDto;
 import com.aptech.proj4.dto.TaskDto;
@@ -13,6 +14,7 @@ import com.aptech.proj4.model.Submit;
 import com.aptech.proj4.model.Task;
 import com.aptech.proj4.repository.SubmitRepository;
 
+@Service
 public class SubmitServiceImpl implements SubmitService {
   @Autowired
   SubmitRepository submitRepository;
