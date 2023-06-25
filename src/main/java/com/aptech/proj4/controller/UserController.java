@@ -199,8 +199,11 @@ public class UserController {
     @GetMapping(value = "/image/{pp}", produces = MediaType.IMAGE_JPEG_VALUE)
     public ResponseEntity<?> getImage(@PathVariable String pp) throws IOException {
         Path image = Paths.get("files/imgs/user-pp/" + pp);
-        byte[] data = Files.readAllBytes(image);
-        ByteArrayResource resource = new ByteArrayResource(data);
-        return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(resource);
+        if (Files.exists(image)) {
+            byte[] data = Files.readAllBytes(image);
+            ByteArrayResource resource = new ByteArrayResource(data);
+            return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(resource);
+        }
+        return ResponseEntity.notFound().build();
     }
 }
