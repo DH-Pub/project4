@@ -1,10 +1,14 @@
 package com.aptech.proj4.controller;
 
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
 import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.io.ByteArrayResource;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -190,5 +194,13 @@ public class UserController {
                     return ResponseEntity.ok(jwtUtils.generateTokenFromEmail(user.getEmail()));
                 })
                 .orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!"));
+    }
+
+    @GetMapping(value = "/image/{pp}", produces = MediaType.IMAGE_JPEG_VALUE)
+    public ResponseEntity<?> getImage(@PathVariable String pp) throws IOException {
+        Path image = Paths.get("files/imgs/user-pp/" + pp);
+        byte[] data = Files.readAllBytes(image);
+        ByteArrayResource resource = new ByteArrayResource(data);
+        return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(resource);
     }
 }

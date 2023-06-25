@@ -45,6 +45,7 @@ public class SecurityConfiguration {
             "/auth/login",
             "/auth/signup",
             "/auth/refreshtoken",
+            "auth/image/**",
     };
 
     @Bean
@@ -56,20 +57,21 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager)
             throws Exception {
         // http
-        //         .cors(withDefaults()).csrf(csrf -> csrf.disable())
-        //         .authorizeHttpRequests(authorize -> {
-        //             try {
-        //                 authorize
-        //                         .requestMatchers(ENDPOINTS_WHITELIST).permitAll()
-        //                         .anyRequest().authenticated().and()
-        //                         .exceptionHandling(handling -> handling.authenticationEntryPoint(
-        //                                 (req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
-        //                         .addFilter(new JwtAuthenticationFilter(authenticationManager, jwtUtils))
-        //                         .addFilter(new JwtAuthorizationFilter(authenticationManager));
-        //             } catch (Exception e) {
-        //                 e.printStackTrace();
-        //             }
-        //         }).sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        // .cors(withDefaults()).csrf(csrf -> csrf.disable())
+        // .authorizeHttpRequests(authorize -> {
+        // try {
+        // authorize
+        // .requestMatchers(ENDPOINTS_WHITELIST).permitAll()
+        // .anyRequest().authenticated().and()
+        // .exceptionHandling(handling -> handling.authenticationEntryPoint(
+        // (req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
+        // .addFilter(new JwtAuthenticationFilter(authenticationManager, jwtUtils))
+        // .addFilter(new JwtAuthorizationFilter(authenticationManager));
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // }
+        // }).sessionManagement((session) ->
+        // session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http
                 .cors(withDefaults()).csrf(csrf -> csrf.disable())
