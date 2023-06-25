@@ -11,6 +11,7 @@ import org.springframework.stereotype.Service;
 import com.aptech.proj4.dto.TeamDto;
 import com.aptech.proj4.dto.TeamMemberDetailDto;
 import com.aptech.proj4.dto.TeamMemberDto;
+import com.aptech.proj4.dto.UserTeamDto;
 import com.aptech.proj4.model.Team;
 import com.aptech.proj4.model.TeamMember;
 import com.aptech.proj4.model.TeamMemberRole;
@@ -149,6 +150,12 @@ public class TeamServiceImpl implements TeamService {
         TeamMemberDetailDto member = memberRepository.getMemberDetailsByEmail(teamId, email)
                 .orElseThrow(() -> new NoSuchElementException("This user is not a member of the team"));
         return member;
+    }
+
+    @Override
+    public List<UserTeamDto> getAllUserTeams(String userId) {
+        List<UserTeamDto> teams = memberRepository.getAllUserTeams(userId);
+        return teams;
     }
 
     @Override

@@ -23,6 +23,7 @@ import org.springframework.web.bind.annotation.RestController;
 import com.aptech.proj4.dto.TeamDto;
 import com.aptech.proj4.dto.TeamMemberDetailDto;
 import com.aptech.proj4.dto.TeamMemberDto;
+import com.aptech.proj4.dto.UserDto;
 import com.aptech.proj4.model.TeamMemberRole;
 import com.aptech.proj4.model.UserRole;
 import com.aptech.proj4.service.TeamService;
@@ -63,6 +64,19 @@ public class TeamController {
                 return ResponseEntity.ok(teamService.getTeam(id));
             }
             return ResponseEntity.status(HttpStatusCode.valueOf(401)).body("You do not have permission to see this.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/user/{id}")
+    public ResponseEntity<?> getAllUserTeams(@PathVariable String id, Authentication authentication) {
+        try {
+            UserDto user = userService.findUserByEmail(authentication.getPrincipal().toString());
+            if (user != null) {
+                return ResponseEntity.ok(teamService.getAllUserTeams(id));
+            }
+            return ResponseEntity.status(HttpStatusCode.valueOf(401)).body("Your account does not exist");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -149,7 +163,8 @@ public class TeamController {
     public ResponseEntity<?> addMember(Authentication authentication, @RequestBody TeamMemberDto teamMemberDto) {
         try {
             if (teamMemberDto.getRole().equals(TeamMemberRole.CREATOR.toString())) {
-                return ResponseEntity.status(HttpStatusCode.valueOf(401)).body("Cannot assign role CREATOR to new member.");
+                return ResponseEntity.status(HttpStatusCode.valueOf(401))
+                        .body("Cannot assign role CREATOR to new member.");
             }
             TeamMemberDetailDto member = teamService.getMemberDetailByEmail(teamMemberDto.getTeamId(),
                     authentication.getPrincipal().toString());
