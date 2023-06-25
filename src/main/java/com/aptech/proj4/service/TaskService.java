@@ -8,7 +8,7 @@ import com.aptech.proj4.dto.TaskDto;
 import com.aptech.proj4.model.Task;
 
 public interface TaskService {
-    TaskDto createTask(TaskDto task, String creatingUser);
+    boolean createTask(MultipartFile[] files, TaskDto task, String creatingUser);
     List<Task> getAllTasks();
     TaskDto getTaskById(String id, String authentication);
 }
