@@ -9,7 +9,7 @@ import com.aptech.proj4.dto.TaskDto;
 import com.aptech.proj4.model.Submit;
 
 public interface SubmitService {
-  SubmitDto uploadSubmit(SubmitDto submitDto, TaskDto taskDto);
+  SubmitDto uploadSubmit(SubmitDto submitDto, String taskId);
 
   boolean deleteSubmit(String id);
 

@@ -35,7 +35,7 @@ public class SubmitController {
   public ResponseEntity<?> uploadFile(
       @RequestPart(value = "attached", required = true) MultipartFile file,
       @RequestPart(value = "submit") SubmitDto submitDto,
-      @RequestPart(value = "taskId") TaskDto taskDto) {
+      @RequestPart(value = "taskId") String taskId) {
     try {
       SubmitDto submit = new SubmitDto();
       if (file != null) {
@@ -43,13 +43,13 @@ public class SubmitController {
         String randomPrefix = UUID.randomUUID().toString(); // Random code
         String fileName = randomPrefix + "_" + StringUtils.cleanPath(originalFilename);
         submitDto.setAttached(fileName);
-        submit = submitService.uploadSubmit(submitDto, taskDto);
+        submit = submitService.uploadSubmit(submitDto, taskId);
 
         String uploadDir = "documents/submit";
         FileUploadUtil.saveFile(uploadDir, submit.getAttached(), file);
       } else {
         submitDto.setAttached(null);
-        submit = submitService.uploadSubmit(submitDto, taskDto);
+        submit = submitService.uploadSubmit(submitDto, taskId);
       }
       return ResponseEntity.ok(submit);
     } catch (RuntimeException e) {

@@ -23,8 +23,8 @@ public class SubmitServiceImpl implements SubmitService {
   TaskRepository taskRepository;
 
   @Override
-  public SubmitDto uploadSubmit(SubmitDto submitDto, TaskDto taskDto) {
-    Task task = taskRepository.findById(taskDto.getId().toString())
+  public SubmitDto uploadSubmit(SubmitDto submitDto, String taskId) {
+    Task task = taskRepository.findById(taskId)
         .orElseThrow(() -> new RuntimeException("Task not found"));
 
     Submit newSubmit = new Submit()
