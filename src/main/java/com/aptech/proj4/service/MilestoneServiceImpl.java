@@ -2,7 +2,12 @@ package com.aptech.proj4.service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.time.LocalDate;
+import java.time.format.DateTimeFormatter;
+import java.sql.Date;
+import java.text.SimpleDateFormat;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -20,7 +25,7 @@ public class MilestoneServiceImpl implements MilestoneService {
     @Autowired
     ProjectRepository projectRepository;
 
-     @Override
+    @Override
     public MilestoneDto createMilestone(MilestoneDto milestoneDto, String projectId) {
         Project project = projectRepository.findById(projectId)
                 .orElseThrow(() -> new RuntimeException("Project ID not found"));
@@ -41,7 +46,6 @@ public class MilestoneServiceImpl implements MilestoneService {
 
         return milestoneDto;
     }
-
 
     @Override
     public boolean deleteMilestone(String id) {
@@ -69,6 +73,22 @@ public class MilestoneServiceImpl implements MilestoneService {
             return milestones;
         }
         throw new RuntimeException("Milestone name not found");
+    }
+
+    @Override
+    public MilestoneDto updateMilestone(String id, MilestoneDto milestoneDto) {
+        Milestone existingMilestone = milestoneRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Milestone ID not found"));
+
+                existingMilestone.setName(milestoneDto.getName());
+                existingMilestone.setDescription(milestoneDto.getDescription());
+                existingMilestone.setFrom(milestoneDto.getFrom());
+                existingMilestone.setTo(milestoneDto.getTo());
+
+        Milestone updatedMilestone = milestoneRepository.save(existingMilestone);
+
+        MilestoneDto updatedMilestoneDto = modelMapper.map(updatedMilestone, MilestoneDto.class);
+        return updatedMilestoneDto;
     }
 
 }

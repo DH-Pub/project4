@@ -15,6 +15,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.aptech.proj4.dto.MilestoneDto;
 import com.aptech.proj4.dto.ProjectDto;
 import com.aptech.proj4.model.Project;
 import com.aptech.proj4.service.ProjectService;
@@ -78,6 +79,13 @@ public class ProjectController {
         return ResponseEntity.ok(dtos);
     }
 
-   
+   @PutMapping("/{id}")
+  public ResponseEntity<ProjectDto> updateProject(@PathVariable String id, @RequestBody ProjectDto projectDto) {
+    ProjectDto updatedProject = projectService.updateproject(id, projectDto);
+    if (updatedProject != null) {
+      return ResponseEntity.ok(updatedProject);
+    }
+    return ResponseEntity.notFound().build();
+  }
 
 }

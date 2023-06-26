@@ -18,4 +18,6 @@ public interface MilestoneService {
 
     List<Milestone> findMilestoneByName(String name);
 
+    MilestoneDto updateMilestone(String id, MilestoneDto milestone);
+
 }
