@@ -1,7 +1,6 @@
 package com.aptech.proj4.dto;
 
 import java.util.List;
-import java.util.Set;
 
 import com.aptech.proj4.enums.TaskCategory;
 import com.aptech.proj4.enums.TaskPriority;
