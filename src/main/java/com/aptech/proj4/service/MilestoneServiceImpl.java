@@ -2,10 +2,6 @@ package com.aptech.proj4.service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.sql.Date;
-import java.text.SimpleDateFormat;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -24,6 +20,8 @@ public class MilestoneServiceImpl implements MilestoneService {
     MilestoneRepository milestoneRepository;
     @Autowired
     ProjectRepository projectRepository;
+    @Autowired
+    ModelMapper modelMapper;
 
     @Override
     public MilestoneDto createMilestone(MilestoneDto milestoneDto, String projectId) {

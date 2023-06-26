@@ -3,13 +3,11 @@ package com.aptech.proj4.service;
 import java.util.List;
 import java.util.NoSuchElementException;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import com.aptech.proj4.dto.MilestoneDto;
 import com.aptech.proj4.dto.ProjectDto;
-import com.aptech.proj4.dto.TeamDto;
-import com.aptech.proj4.model.Milestone;
 import com.aptech.proj4.model.Project;
 import com.aptech.proj4.model.Team;
 import com.aptech.proj4.repository.ProjectRepository;
@@ -20,11 +18,12 @@ import com.aptech.proj4.repository.TeamRepository;
 public class ProjectServiceImpl implements ProjectService {
     @Autowired
     ProjectRepository projectRepository;
-
     @Autowired
     TeamRepository teamRepository;
     @Autowired
     TeamMemberRepository teamMemberRepository;
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public ProjectDto createProject(ProjectDto projectDto, String teamId) {
