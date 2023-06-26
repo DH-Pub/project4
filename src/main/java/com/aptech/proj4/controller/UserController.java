@@ -116,6 +116,16 @@ public class UserController {
         return ResponseEntity.ok(userService.changeAdminRole(userDto));
     }
 
+    @GetMapping("/account")
+    public ResponseEntity<?> getPersonalAccount(Authentication authentication) {
+        try {
+            UserDto user = userService.findUserByEmail(authentication.getPrincipal().toString());
+            return ResponseEntity.ok(user);
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
     @GetMapping("/user/{id}")
     public ResponseEntity<?> getUser(@PathVariable String id, Authentication authentication) {
         try {

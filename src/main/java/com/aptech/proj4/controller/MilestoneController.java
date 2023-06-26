@@ -16,11 +16,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aptech.proj4.dto.MilestoneDto;
-import com.aptech.proj4.dto.ProjectDto;
 import com.aptech.proj4.model.Milestone;
-import com.aptech.proj4.model.Project;
 import com.aptech.proj4.service.MilestoneService;
-import com.aptech.proj4.service.ProjectService;
 
 @RestController
 @RequestMapping("/milestone")

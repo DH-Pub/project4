@@ -1,23 +1,14 @@
 package com.aptech.proj4.service;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.sql.Date;
 
-
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.aptech.proj4.dto.MilestoneDto;
-import com.aptech.proj4.dto.ProjectDto;
 import com.aptech.proj4.model.Milestone;
 import com.aptech.proj4.model.Project;
-import com.aptech.proj4.model.Team;
 import com.aptech.proj4.repository.MilestoneRepository;
 import com.aptech.proj4.repository.ProjectRepository;
 
@@ -28,8 +19,6 @@ public class MilestoneServiceImpl implements MilestoneService {
     MilestoneRepository milestoneRepository;
     @Autowired
     ProjectRepository projectRepository;
-    @Autowired
-    private ModelMapper modelMapper;
 
      @Override
     public MilestoneDto createMilestone(MilestoneDto milestoneDto, String projectId) {
