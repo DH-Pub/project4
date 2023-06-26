@@ -33,7 +33,7 @@ public class Document implements Serializable {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "files", columnDefinition = "TEXT")
+    @Column(name = "files", columnDefinition = "text")
     private String files;
 
     @ManyToOne
