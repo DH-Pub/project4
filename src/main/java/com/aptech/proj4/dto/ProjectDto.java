@@ -11,6 +11,7 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 @NoArgsConstructor
+@AllArgsConstructor
 @ToString
 public class ProjectDto {
     private String id;

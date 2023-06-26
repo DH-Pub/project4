@@ -3,7 +3,6 @@ package com.aptech.proj4.service;
 import java.util.List;
 import java.util.NoSuchElementException;
 
-import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.core.io.Resource;
@@ -23,8 +22,6 @@ public class DocumentServiceImpl implements DocumentService {
   DocumentRepository documentRepository;
   @Autowired
   ProjectRepository projectRepository;
-  @Autowired
-  private ModelMapper modelMapper;
 
   @Override
   public DocumentDto createDocument(DocumentDto documentDto, ProjectDto projectDto) {
