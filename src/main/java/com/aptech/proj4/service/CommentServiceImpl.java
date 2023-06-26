@@ -1,16 +1,15 @@
 package com.aptech.proj4.service;
 
-import java.time.LocalDateTime;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
-import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.aptech.proj4.dto.CommentDto;
-import com.aptech.proj4.dto.UserDto;
 import com.aptech.proj4.model.Comment;
 import com.aptech.proj4.model.Task;
 import com.aptech.proj4.model.User;
@@ -68,6 +67,8 @@ public class CommentServiceImpl implements CommentService {
         .orElseThrow(() -> new NoSuchElementException("Comment ID not found"));
 
     existingComment.setComment(commentDto.getComment());
+    existingComment.setModifiedAt(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
+
     Comment updatedComment = commentRepository.save(existingComment);
 
     CommentDto updatedCommentDto = modelMapper.map(updatedComment, CommentDto.class);

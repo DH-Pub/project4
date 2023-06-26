@@ -3,6 +3,7 @@ package com.aptech.proj4.model;
 import java.io.Serializable;
 
 import org.hibernate.annotations.CreationTimestamp;
+import org.hibernate.annotations.UpdateTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
@@ -48,4 +49,8 @@ public class Comment implements Serializable {
   @CreationTimestamp
   @Column(name = "created_at", columnDefinition = "DATETIME")
   private String createdAt;
+
+  @UpdateTimestamp
+  @Column(name = "modified_at", columnDefinition = "DATETIME")
+  private String modifiedAt;
 }

@@ -26,7 +26,7 @@ public class CommentController {
   private CommentService commentService;
 
   @PostMapping("/create")
-  public ResponseEntity<?> createdComment(@RequestBody CommentDto commentDto, @RequestParam String taskId,
+  public ResponseEntity<?> createdComment(@RequestBody() CommentDto commentDto, @RequestParam String taskId,
       @RequestParam String userId) {
     CommentDto savedComment = commentService.createComment(commentDto, taskId, userId);
     return ResponseEntity.ok(savedComment);
