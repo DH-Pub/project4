@@ -44,7 +44,6 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public boolean createTask(MultipartFile[] files, TaskDto taskDto, String creatingUser) {
         Task task = new Task();
-        Submit submit = new Submit();
         SubmitDto submitDto = new SubmitDto();
         List<User> users = new ArrayList<User>();
         // List<String> files = taskDto.getFiles();
@@ -99,7 +98,7 @@ public class TaskServiceImpl implements TaskService {
                     String randomPrefix = UUID.randomUUID().toString(); // Random code
                     String fileName = randomPrefix + "_" + StringUtils.cleanPath(originalFilename);
                     submitDto.setAttached(fileName);
-                    if(submitService.uploadSubmit(submitDto, taskDto) != null) {
+                    if(submitService.uploadSubmit(submitDto, taskDto.getId()) != null) {
                         try {
                             FileUploadUtil.saveFile(uploadDir, fileName, file);
                         } catch (IOException e) {
