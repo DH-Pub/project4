@@ -4,6 +4,7 @@ import java.util.List;
 
 import org.springframework.stereotype.Service;
 
+import com.aptech.proj4.dto.MilestoneDto;
 import com.aptech.proj4.dto.ProjectDto;
 import com.aptech.proj4.dto.TeamDto;
 import com.aptech.proj4.model.Project;
@@ -19,5 +20,7 @@ public interface ProjectService {
 
 
     List<Project> findProjectByName(String name); // use string `files`
+
+    ProjectDto updateproject(String id, ProjectDto project);
 
 }

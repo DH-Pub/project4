@@ -8,8 +8,10 @@ import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.aptech.proj4.dto.MilestoneDto;
 import com.aptech.proj4.dto.ProjectDto;
 import com.aptech.proj4.dto.TeamDto;
+import com.aptech.proj4.model.Milestone;
 import com.aptech.proj4.model.Project;
 import com.aptech.proj4.model.Team;
 import com.aptech.proj4.repository.ProjectRepository;
@@ -20,7 +22,7 @@ import com.aptech.proj4.repository.TeamRepository;
 public class ProjectServiceImpl implements ProjectService {
     @Autowired
     ProjectRepository projectRepository;
-    
+
     @Autowired
     TeamRepository teamRepository;
     @Autowired
@@ -32,14 +34,13 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public ProjectDto createProject(ProjectDto projectDto, String teamId) {
         Team team = teamRepository.findById(teamId)
-            .orElseThrow(() -> new RuntimeException("Team ID not found"));
+                .orElseThrow(() -> new RuntimeException("Team ID not found"));
 
         Project project = new Project()
                 .setId(Long.toString(System.currentTimeMillis()))
                 .setName(projectDto.getName())
                 .setTeam(team);
-        
-                
+
         projectRepository.save(project);
         return projectDto;
     }
@@ -64,13 +65,13 @@ public class ProjectServiceImpl implements ProjectService {
 
     // @Override
     // public ProjectDto getProject(String id) {
-    //     Optional<Project> project = Optional.ofNullable(projectRepository.findById(id).get());
-    //     if (project.isPresent()) {
-    //         return modelMapper.map(project.get(), ProjectDto.class);
-    //     }
-    //     throw new RuntimeException("Project does not exist");
+    // Optional<Project> project =
+    // Optional.ofNullable(projectRepository.findById(id).get());
+    // if (project.isPresent()) {
+    // return modelMapper.map(project.get(), ProjectDto.class);
     // }
-
+    // throw new RuntimeException("Project does not exist");
+    // }
 
     @Override
     public List<Project> findProjectByName(String name) {
@@ -80,6 +81,19 @@ public class ProjectServiceImpl implements ProjectService {
             return projects;
         }
         throw new RuntimeException("Project name not found");
+    }
+
+    @Override
+    public ProjectDto updateproject(String id, ProjectDto projectDto) {
+        Project existingProject = projectRepository.findById(id)
+                .orElseThrow(() -> new NoSuchElementException("Project ID not found"));
+
+        existingProject.setName(projectDto.getName());
+
+        Project updatedProject = projectRepository.save(existingProject);
+
+        ProjectDto updatedProjectDto = modelMapper.map(updatedProject, ProjectDto.class);
+        return updatedProjectDto;
     }
 
 }
