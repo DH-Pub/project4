@@ -17,7 +17,6 @@ import org.springframework.web.multipart.MultipartFile;
 import com.aptech.proj4.dto.SubmitDto;
 import com.aptech.proj4.dto.TaskDto;
 import com.aptech.proj4.model.Assignee;
-import com.aptech.proj4.model.Submit;
 import com.aptech.proj4.model.Task;
 import com.aptech.proj4.model.User;
 import com.aptech.proj4.repository.AssigneeRepository;

@@ -24,8 +24,8 @@ import com.aptech.proj4.dto.TeamDto;
 import com.aptech.proj4.dto.TeamMemberDetailDto;
 import com.aptech.proj4.dto.TeamMemberDto;
 import com.aptech.proj4.dto.UserDto;
-import com.aptech.proj4.model.TeamMemberRole;
-import com.aptech.proj4.model.UserRole;
+import com.aptech.proj4.enums.TeamMemberRole;
+import com.aptech.proj4.enums.UserRole;
 import com.aptech.proj4.service.TeamService;
 import com.aptech.proj4.service.UserService;
 

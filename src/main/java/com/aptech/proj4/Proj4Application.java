@@ -10,8 +10,8 @@ import org.springframework.context.annotation.Bean;
 import org.springframework.security.crypto.password.PasswordEncoder;
 
 import com.aptech.proj4.config.SecurityConstants;
+import com.aptech.proj4.enums.UserRole;
 import com.aptech.proj4.model.User;
-import com.aptech.proj4.model.UserRole;
 import com.aptech.proj4.repository.UserRepository;
 
 import io.swagger.v3.oas.annotations.OpenAPIDefinition;

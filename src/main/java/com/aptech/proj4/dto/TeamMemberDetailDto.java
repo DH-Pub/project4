@@ -1,6 +1,6 @@
 package com.aptech.proj4.dto;
 
-import com.aptech.proj4.model.TeamMemberRole;
+import com.aptech.proj4.enums.TeamMemberRole;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
