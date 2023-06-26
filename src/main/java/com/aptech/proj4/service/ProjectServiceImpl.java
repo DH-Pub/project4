@@ -30,13 +30,15 @@ public class ProjectServiceImpl implements ProjectService {
     private ModelMapper modelMapper;
 
     @Override
-    public ProjectDto createProject(ProjectDto projectDto, String authentication) {
-        Optional<Team> teamOptional = teamRepository.findById(projectDto.getTeam_id());
-        Team team = teamOptional.get();
+    public ProjectDto createProject(ProjectDto projectDto, String teamId) {
+        Team team = teamRepository.findById(teamId)
+            .orElseThrow(() -> new RuntimeException("Team ID not found"));
+
         Project project = new Project()
-                .setId(projectDto.getId())
+                .setId(Long.toString(System.currentTimeMillis()))
                 .setName(projectDto.getName())
                 .setTeam(team);
+        
                 
         projectRepository.save(project);
         return projectDto;
@@ -45,7 +47,7 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public boolean deleteProject(String id) {
         Project project = projectRepository.findById(id)
-                .orElseThrow(() -> new NoSuchElementException("Project not found"));
+                .orElseThrow(() -> new NoSuchElementException("Project ID not found"));
         try {
             projectRepository.delete(project);
         } catch (Exception e) {
@@ -55,37 +57,27 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-    public List<Project> getAllProjects(String authentication) {
+    public List<Project> getAllProjects() {
         List<Project> projects = (List<Project>) projectRepository.findAll();
         return projects;
     }
 
-    @Override
-    public ProjectDto getProject(String id) {
-        Optional<Project> project = Optional.ofNullable(projectRepository.findById(id).get());
-        if (project.isPresent()) {
-            return modelMapper.map(project.get(), ProjectDto.class);
-        }
-        throw new RuntimeException("Project does not exist");
-    }
+    // @Override
+    // public ProjectDto getProject(String id) {
+    //     Optional<Project> project = Optional.ofNullable(projectRepository.findById(id).get());
+    //     if (project.isPresent()) {
+    //         return modelMapper.map(project.get(), ProjectDto.class);
+    //     }
+    //     throw new RuntimeException("Project does not exist");
+    // }
+
 
     @Override
-    public ProjectDto updateProject(ProjectDto projectDto) {
-        Project updatedProject = modelMapper.map(projectDto, Project.class);
-        try {
-            projectRepository.save(updatedProject);
-        } catch (Exception e) {
-            return null;
-        }
-        return projectDto;
-    }
+    public List<Project> findProjectByName(String name) {
+        List<Project> projects = projectRepository.findByName(name);
 
-    @Override
-    public Project findProjectByName(String name, String authen) {
-        Optional<Project> project = projectRepository.findByName(name);
-        if (project.isPresent()) {
-            Project xProject = project.get();
-            return xProject;
+        if (!projects.isEmpty()) {
+            return projects;
         }
         throw new RuntimeException("Project name not found");
     }
