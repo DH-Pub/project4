@@ -1,6 +1,5 @@
 package com.aptech.proj4.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,11 +10,11 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 @NoArgsConstructor
-@AllArgsConstructor
 @ToString
-public class ProjectDto {
-    private String id;
-    private String name;
-    private String team_id;
-    private String createAt;
+public class SubmitDto {
+  private String id;
+  private String taskId;
+  private String note;
+  private String attached;
+  private String submittedAt;
 }

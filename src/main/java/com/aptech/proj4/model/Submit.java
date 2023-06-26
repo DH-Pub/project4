@@ -24,26 +24,25 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "projects")
-public class Project implements Serializable {
-    @Id
-    @Column(name = "id")
-    private String id;
+@Table(name = "submits")
+public class Submit implements Serializable {
+  @Id
+  @Column(name = "id")
+  private String id;
 
-    @Column(name = "name")
-    private String name;
+  @ManyToOne
+  @JoinColumn(name = "task_id") // many to one
+  @EqualsAndHashCode.Exclude
+  @ToString.Exclude
+  private Task taskId;
 
-    @ManyToOne()
-    @JoinColumn(name = "team_id"  )
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private Team team;
+  @Column(name = "note")
+  private String note;
 
-    @CreationTimestamp
-    @Column(name = "created_at", columnDefinition = "DATETIME")
-    private String createdAt;
+  @Column(name = "attached", columnDefinition = "TEXT")
+  private String attached;
 
-    //  @OneToMany(mappedBy="project", cascade = CascadeType.ALL)
-    // private Set<Milestone> milestones;
-
+  @CreationTimestamp
+  @Column(name = "submitted_at", columnDefinition = "DATETIME")
+  private String submittedAt;
 }

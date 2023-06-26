@@ -2,6 +2,8 @@ package com.aptech.proj4.model;
 
 import java.io.Serializable;
 
+import org.hibernate.annotations.CreationTimestamp;
+
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.Id;
@@ -19,31 +21,28 @@ import lombok.experimental.Accessors;
 @Getter
 @Setter
 @Accessors(chain = true)
-@AllArgsConstructor
 @NoArgsConstructor
+@AllArgsConstructor
 @Entity
-@Table(name = "milestone")
-public class Milestone implements Serializable {
+@Table(name = "documents")
+public class Document implements Serializable {
     @Id
     @Column(name = "id")
     private String id;
 
-    @Column(name = "name")
-    private String name;
-
     @Column(name = "description")
     private String description;
 
-    @Column(name = "[from]")
-    private String from;
-
-    @Column(name = "[to]")
-    private String to;
+    @Column(name = "files", columnDefinition = "text")
+    private String files;
 
     @ManyToOne
-    @JoinColumn(name = "projects_id")
+    @JoinColumn(name = "project_id") // many to one
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Project project;
 
+    @CreationTimestamp
+    @Column(name = "created_at", columnDefinition = "DATETIME")
+    private String createdAt;
 }

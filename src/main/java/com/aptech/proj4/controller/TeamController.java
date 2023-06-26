@@ -21,11 +21,11 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aptech.proj4.dto.TeamDto;
+import com.aptech.proj4.dto.TeamMemberDetailDto;
 import com.aptech.proj4.dto.TeamMemberDto;
 import com.aptech.proj4.dto.UserDto;
-import com.aptech.proj4.model.TeamMember;
-import com.aptech.proj4.model.TeamMemberRole;
-import com.aptech.proj4.model.UserRole;
+import com.aptech.proj4.enums.TeamMemberRole;
+import com.aptech.proj4.enums.UserRole;
 import com.aptech.proj4.service.TeamService;
 import com.aptech.proj4.service.UserService;
 
@@ -49,11 +49,9 @@ public class TeamController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getTeam(@PathVariable String id, Authentication authentication) {
         try {
-            // check if user is in the team
-            List<UserDto> teamMembers = teamService.getAllMembersDetails(id);
-            String user = authentication.getPrincipal().toString();
-            boolean inTeam = teamMembers.stream().filter(m -> m.getEmail().equals(user)).findFirst().isPresent();
-            if (inTeam) {
+            TeamMemberDetailDto member = teamService.getMemberDetailByEmail(id,
+                    authentication.getPrincipal().toString());
+            if (member != null) {
                 return ResponseEntity.ok(teamService.getTeam(id));
             }
 
@@ -65,7 +63,20 @@ public class TeamController {
             if (isMainOrAdmin) {
                 return ResponseEntity.ok(teamService.getTeam(id));
             }
-            return ResponseEntity.status(HttpStatusCode.valueOf(401)).body("You do not have permission to see this.");
+            return ResponseEntity.status(HttpStatusCode.valueOf(403)).body("You do not have permission to see this.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
+    @GetMapping("/user")
+    public ResponseEntity<?> getAllUserTeams(Authentication authentication) {
+        try {
+            UserDto user = userService.findUserByEmail(authentication.getPrincipal().toString());
+            if (user != null) {
+                return ResponseEntity.ok(teamService.getAllUserTeams(user.getId()));
+            }
+            return ResponseEntity.status(HttpStatusCode.valueOf(403)).body("Your account does not exist");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -82,17 +93,16 @@ public class TeamController {
     }
 
     @PutMapping("/update")
-    public ResponseEntity<?> updateTeam(Authentication authentication, @RequestBody TeamDto teamDto) {
+    public ResponseEntity<?> updateTeam(Authentication authentication,
+            @RequestBody TeamDto teamDto) {
         try {
-            // check if user is in the team
-            List<TeamMember> members = teamService.getAllMembers(teamDto.getId());
-            UserDto user = userService.findUserByEmail(authentication.getPrincipal().toString());
-            Optional<TeamMember> member = members.stream().filter(m -> m.getUser().getId().equals(user.getId()))
-                    .findFirst();
-            if (member.isPresent() && member.get().getRole().equals(TeamMemberRole.CREATOR)) {
+            TeamMemberDetailDto member = teamService.getMemberDetailByEmail(teamDto.getId(),
+                    authentication.getPrincipal().toString());
+            if (member != null && member.getTeamMemberRole().equals(TeamMemberRole.CREATOR)) {
                 return ResponseEntity.ok(teamService.updateTeam(teamDto));
             }
-            return ResponseEntity.status(HttpStatusCode.valueOf(401)).body("You do not have permission to see this.");
+            return ResponseEntity.status(HttpStatusCode.valueOf(403))
+                    .body("You do not have permission to update this team.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -101,17 +111,10 @@ public class TeamController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteTeam(@PathVariable String id, Authentication authentication) {
         try {
-            // check if user is in the team
-            List<TeamMember> members = teamService.getAllMembers(id);
-            UserDto user = userService.findUserByEmail(authentication.getPrincipal().toString());
-            Optional<TeamMember> member = members.stream().filter(m -> m.getUser().getId().equals(user.getId()))
-                    .findFirst();
-            if (member.isPresent()) {
-                // check if user has CREATOR priviledge
-                TeamMemberRole memberRole = member.get().getRole();
-                if (memberRole.equals(TeamMemberRole.CREATOR)) {
-                    return ResponseEntity.ok(teamService.deleteTeam(id));
-                }
+            TeamMemberDetailDto member = teamService.getMemberDetailByEmail(id,
+                    authentication.getPrincipal().toString());
+            if (member != null && member.getTeamMemberRole().equals(TeamMemberRole.CREATOR)) {
+                return ResponseEntity.ok(teamService.deleteTeam(id));
             }
 
             // else for main and admins
@@ -123,7 +126,7 @@ public class TeamController {
                 return ResponseEntity.ok(teamService.deleteTeam(id));
             }
 
-            return ResponseEntity.status(HttpStatusCode.valueOf(401)).body("You do not have permission.");
+            return ResponseEntity.status(HttpStatusCode.valueOf(403)).body("You do not have permission.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -133,9 +136,10 @@ public class TeamController {
     public ResponseEntity<?> getAllMembersDetails(Authentication authentication, @PathVariable String id) {
         try {
             // check if user is in the team
-            List<UserDto> teamMembers = teamService.getAllMembersDetails(id);
+            List<TeamMemberDetailDto> teamMembers = teamService.getAllMembersDetails(id);
             String user = authentication.getPrincipal().toString();
-            Optional<UserDto> member = teamMembers.stream().filter(m -> m.getEmail().equals(user)).findFirst();
+            Optional<TeamMemberDetailDto> member = teamMembers.stream().filter(m -> m.getEmail().equals(user))
+                    .findFirst();
             if (member.isPresent()) {
                 return ResponseEntity.ok(teamMembers);
             }
@@ -149,7 +153,7 @@ public class TeamController {
                 return ResponseEntity.ok(teamMembers);
             }
 
-            return ResponseEntity.status(HttpStatusCode.valueOf(401)).body("You do not have permission.");
+            return ResponseEntity.status(HttpStatusCode.valueOf(403)).body("You do not have permission.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
@@ -158,49 +162,60 @@ public class TeamController {
     @PostMapping("/add-member")
     public ResponseEntity<?> addMember(Authentication authentication, @RequestBody TeamMemberDto teamMemberDto) {
         try {
-            return ResponseEntity.ok(teamService.addMember(teamMemberDto, authentication.getPrincipal().toString()));
+            if (teamMemberDto.getRole().equals(TeamMemberRole.CREATOR.toString())) {
+                return ResponseEntity.status(HttpStatusCode.valueOf(403))
+                        .body("Cannot assign role CREATOR to new member.");
+            }
+            TeamMemberDetailDto member = teamService.getMemberDetailByEmail(teamMemberDto.getTeamId(),
+                    authentication.getPrincipal().toString());
+
+            TeamMemberRole memberRole = member.getTeamMemberRole();
+            if (memberRole.equals(TeamMemberRole.CREATOR)
+                    || memberRole.equals(TeamMemberRole.ADMINISTRATOR)) {
+                return ResponseEntity
+                        .ok(teamService.addMember(teamMemberDto, authentication.getPrincipal().toString()));
+            }
+            return ResponseEntity.status(HttpStatusCode.valueOf(403)).body("You do not have permission.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
-    @DeleteMapping("/remove-member/{id}")
+    @DeleteMapping("/remove-member")
     public ResponseEntity<?> removeMember(Authentication authentication, @RequestBody TeamMemberDto teamMemberDto) {
         try {
-            // check if user is in the team
-            List<TeamMember> members = teamService.getAllMembers(teamMemberDto.getTeamId());
-            UserDto user = userService.findUserByEmail(authentication.getPrincipal().toString());
-            Optional<TeamMember> member = members.stream().filter(m -> m.getUser().getId().equals(user.getId()))
-                    .findFirst();
-            if (member.isPresent()) {
-                TeamMemberRole memberRole = member.get().getRole();
-                if (memberRole.equals(TeamMemberRole.CREATOR)
-                        || memberRole.equals(TeamMemberRole.ADMINISTRATOR)) {
-                    return ResponseEntity.ok(teamService.removeMember(teamMemberDto.getId()));
-                }
+            TeamMemberDetailDto member = teamService.getMemberDetailByEmail(teamMemberDto.getTeamId(),
+                    authentication.getPrincipal().toString());
+
+            TeamMemberRole memberRole = member.getTeamMemberRole();
+            if (memberRole.equals(TeamMemberRole.CREATOR)
+                    || memberRole.equals(TeamMemberRole.ADMINISTRATOR)
+                    // allow self-removal
+                    || member.getEmail().equals(authentication.getPrincipal().toString())) {
+                return ResponseEntity.ok(teamService.removeMember(teamMemberDto.getId()));
             }
-            return ResponseEntity.status(HttpStatusCode.valueOf(401)).body("You do not have permission.");
+            return ResponseEntity.status(HttpStatusCode.valueOf(403)).body("You do not have permission.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 
     @PutMapping("/change-member-role")
-    public ResponseEntity<?> changeMemberROle(Authentication authentication, @RequestBody TeamMemberDto teamMemberDto) {
+    public ResponseEntity<?> changeMemberROle(Authentication authentication,
+            @RequestBody TeamMemberDto teamMemberDto) {
         try {
-            // check if user is in the team
-            List<TeamMember> members = teamService.getAllMembers(teamMemberDto.getTeamId());
-            UserDto user = userService.findUserByEmail(authentication.getPrincipal().toString());
-            Optional<TeamMember> member = members.stream().filter(m -> m.getUser().getId().equals(user.getId()))
-                    .findFirst();
-            if (member.isPresent()) {
-                TeamMemberRole memberRole = member.get().getRole();
-                if (memberRole.equals(TeamMemberRole.CREATOR)
-                        || memberRole.equals(TeamMemberRole.ADMINISTRATOR)) {
-                    return ResponseEntity.ok(teamService.changeMemberRole(teamMemberDto));
-                }
+            if (teamMemberDto.getRole().equals(TeamMemberRole.CREATOR.toString())) {
+                return ResponseEntity.status(HttpStatusCode.valueOf(403)).body("Cannot change role into CREATOR.");
             }
-            return ResponseEntity.status(HttpStatusCode.valueOf(401)).body("You do not have permission.");
+            TeamMemberDetailDto member = teamService.getMemberDetailByEmail(teamMemberDto.getTeamId(),
+                    authentication.getPrincipal().toString());
+            TeamMemberRole memberRole = member.getTeamMemberRole();
+            if (memberRole.equals(TeamMemberRole.CREATOR)
+                    || memberRole.equals(TeamMemberRole.ADMINISTRATOR)) {
+                return ResponseEntity.ok(teamService.changeMemberRole(teamMemberDto));
+            }
+            return ResponseEntity.status(HttpStatusCode.valueOf(403))
+                    .body("You do not have permission to change role.");
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }

@@ -12,8 +12,8 @@ import org.springframework.stereotype.Service;
 import com.aptech.proj4.config.SecurityConstants;
 import com.aptech.proj4.dto.PasswordDto;
 import com.aptech.proj4.dto.UserDto;
+import com.aptech.proj4.enums.UserRole;
 import com.aptech.proj4.model.User;
-import com.aptech.proj4.model.UserRole;
 import com.aptech.proj4.repository.UserRepository;
 
 @Service

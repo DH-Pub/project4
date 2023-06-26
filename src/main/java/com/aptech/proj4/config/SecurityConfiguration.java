@@ -37,16 +37,6 @@ public class SecurityConfiguration {
         auth.userDetailsService(customUserDetailService).passwordEncoder(passwordEncoder);
     }
 
-    public static final String[] ENDPOINTS_WHITELIST = {
-            "/v3/api-docs/**",
-            "/swagger-resources/**",
-            "/swagger-ui/**",
-            "/swagger-ui.html",
-            "/auth/login",
-            "/auth/signup",
-            "/auth/refreshtoken",
-    };
-
     @Bean
     AuthenticationManager authenticationManager(AuthenticationConfiguration authConfig) throws Exception {
         return authConfig.getAuthenticationManager();
@@ -56,25 +46,26 @@ public class SecurityConfiguration {
     public SecurityFilterChain filterChain(HttpSecurity http, AuthenticationManager authenticationManager)
             throws Exception {
         // http
-        //         .cors(withDefaults()).csrf(csrf -> csrf.disable())
-        //         .authorizeHttpRequests(authorize -> {
-        //             try {
-        //                 authorize
-        //                         .requestMatchers(ENDPOINTS_WHITELIST).permitAll()
-        //                         .anyRequest().authenticated().and()
-        //                         .exceptionHandling(handling -> handling.authenticationEntryPoint(
-        //                                 (req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
-        //                         .addFilter(new JwtAuthenticationFilter(authenticationManager, jwtUtils))
-        //                         .addFilter(new JwtAuthorizationFilter(authenticationManager));
-        //             } catch (Exception e) {
-        //                 e.printStackTrace();
-        //             }
-        //         }).sessionManagement((session) -> session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
+        // .cors(withDefaults()).csrf(csrf -> csrf.disable())
+        // .authorizeHttpRequests(authorize -> {
+        // try {
+        // authorize
+        // .requestMatchers(ENDPOINTS_WHITELIST).permitAll()
+        // .anyRequest().authenticated().and()
+        // .exceptionHandling(handling -> handling.authenticationEntryPoint(
+        // (req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED)))
+        // .addFilter(new JwtAuthenticationFilter(authenticationManager, jwtUtils))
+        // .addFilter(new JwtAuthorizationFilter(authenticationManager));
+        // } catch (Exception e) {
+        // e.printStackTrace();
+        // }
+        // }).sessionManagement((session) ->
+        // session.sessionCreationPolicy(SessionCreationPolicy.STATELESS));
 
         http
                 .cors(withDefaults()).csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(authorize -> authorize
-                        .requestMatchers(ENDPOINTS_WHITELIST).permitAll()
+                        .requestMatchers(SecurityConstants.ENDPOINTS_WHITELIST).permitAll()
                         .anyRequest().authenticated())
                 .exceptionHandling(handling -> handling.authenticationEntryPoint(
                         (req, rsp, e) -> rsp.sendError(HttpServletResponse.SC_UNAUTHORIZED)))

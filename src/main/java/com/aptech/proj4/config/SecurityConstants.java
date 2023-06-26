@@ -8,6 +8,17 @@ public interface SecurityConstants {
     long TOKEN_EXPERITION_TIME = 300_000;
     long REFRESH_TOKEN_EXPIRATION_TIME = 432_000_000;
 
+    String[] ENDPOINTS_WHITELIST = {
+            "/v3/api-docs/**",
+            "/swagger-resources/**",
+            "/swagger-ui/**",
+            "/swagger-ui.html",
+            "/auth/login",
+            "/auth/signup",
+            "/auth/refreshtoken",
+            "auth/image/**",
+    };
+
     String MAIN_EMAIL = "main@email.com";
     String MAIN_PASSWORD = "password";
 }

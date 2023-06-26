@@ -1,6 +1,5 @@
 package com.aptech.proj4.service;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -10,11 +9,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.aptech.proj4.dto.TeamDto;
+import com.aptech.proj4.dto.TeamMemberDetailDto;
 import com.aptech.proj4.dto.TeamMemberDto;
-import com.aptech.proj4.dto.UserDto;
+import com.aptech.proj4.dto.UserTeamDto;
+import com.aptech.proj4.enums.TeamMemberRole;
 import com.aptech.proj4.model.Team;
 import com.aptech.proj4.model.TeamMember;
-import com.aptech.proj4.model.TeamMemberRole;
 import com.aptech.proj4.model.User;
 import com.aptech.proj4.repository.TeamMemberRepository;
 import com.aptech.proj4.repository.TeamRepository;
@@ -107,15 +107,6 @@ public class TeamServiceImpl implements TeamService {
         User addingUser = userRepository.findByEmail(addingUserEmail)
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
 
-        // check if the adding user has permission
-        TeamMember addingMember = members.stream().filter(m -> m.getUser().getId().equals(addingUser.getId()))
-                .findFirst()
-                .orElseThrow(() -> new NoSuchElementException("Member not in team"));
-        if (!addingMember.getRole().equals(TeamMemberRole.CREATOR)
-                && !addingMember.getRole().equals(TeamMemberRole.ADMINISTRATOR)) {
-            throw new RuntimeException("You do not have authority for this action");
-        }
-
         User user = userRepository.findById(teamMemberDto.getUserId())
                 .orElseThrow(() -> new NoSuchElementException("User not found"));
         try {
@@ -143,36 +134,28 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public List<UserDto> getAllMembersDetails(String teamId) {
-        Team team = teamRepository.findById(teamId).orElseThrow(() -> new NoSuchElementException("Team not found"));
-
-        List<TeamMember> members = memberRepository.findByTeam(team);
-
-        List<String> userIds = new ArrayList<String>();
-        for (TeamMember member : members) {
-            userIds.add(member.getUser().getId());
-        }
-        List<User> users = (List<User>) userRepository.findAllById(userIds);
-        users.stream().forEach(u -> u.setPassword(null));
-
-        List<UserDto> userDtos = new ArrayList<UserDto>();
-        for (User user : users) {
-            userDtos.add(modelMapper.map(user, UserDto.class));
-        }
-        return userDtos;
-    }
-
-    @Override
     public TeamMemberDto getMember(String memberUserId, String teamId) {
         // TODO Auto-generated method stub
         throw new UnsupportedOperationException("Unimplemented method 'getMember'");
     }
 
     @Override
-    public List<TeamMember> getAllMembers(String teamId) {
-        Team team = teamRepository.findById(teamId).orElseThrow(() -> new NoSuchElementException("Team not found"));
-        List<TeamMember> members = memberRepository.findByTeam(team);
+    public List<TeamMemberDetailDto> getAllMembersDetails(String teamId) {
+        List<TeamMemberDetailDto> members = memberRepository.allMemberDetails(teamId);
         return members;
+    }
+
+    @Override
+    public TeamMemberDetailDto getMemberDetailByEmail(String teamId, String email) {
+        TeamMemberDetailDto member = memberRepository.getMemberDetailsByEmail(teamId, email)
+                .orElseThrow(() -> new NoSuchElementException("This user is not a member of the team"));
+        return member;
+    }
+
+    @Override
+    public List<UserTeamDto> getAllUserTeams(String userId) {
+        List<UserTeamDto> teams = memberRepository.getAllUserTeams(userId);
+        return teams;
     }
 
     @Override

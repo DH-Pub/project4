@@ -1,6 +1,5 @@
 package com.aptech.proj4.dto;
 
-import lombok.AllArgsConstructor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -11,11 +10,11 @@ import lombok.experimental.Accessors;
 @Setter
 @Accessors(chain = true)
 @NoArgsConstructor
-@AllArgsConstructor
 @ToString
-public class ProjectDto {
+public class DocumentDto {
     private String id;
-    private String name;
-    private String team_id;
+    private String description;
+    private String files; // string for file name
+    private String project_id;
     private String createAt;
 }

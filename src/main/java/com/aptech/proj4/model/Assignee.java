@@ -1,21 +1,19 @@
 package com.aptech.proj4.model;
 
-import java.io.Serializable;
-
 import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
-import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
-import lombok.ToString;
 import lombok.experimental.Accessors;
 
 @Getter
@@ -24,26 +22,25 @@ import lombok.experimental.Accessors;
 @NoArgsConstructor
 @AllArgsConstructor
 @Entity
-@Table(name = "projects")
-public class Project implements Serializable {
+@Table(name = "assignees")
+public class Assignee {
     @Id
     @Column(name = "id")
-    private String id;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private int id;
 
-    @Column(name = "name")
-    private String name;
-
-    @ManyToOne()
-    @JoinColumn(name = "team_id"  )
-    @EqualsAndHashCode.Exclude
-    @ToString.Exclude
-    private Team team;
+    @ManyToOne
+    @JoinColumn(name = "task_id")
+    private Task task;
+    
+    @ManyToOne
+    @JoinColumn(name = "user_id")
+    private User user;
+    
+    @Column(name = "added_by")
+    private String addedUser;
 
     @CreationTimestamp
-    @Column(name = "created_at", columnDefinition = "DATETIME")
-    private String createdAt;
-
-    //  @OneToMany(mappedBy="project", cascade = CascadeType.ALL)
-    // private Set<Milestone> milestones;
-
+    @Column(name = "added_at", columnDefinition = "DATETIME")
+    private String addedAt;
 }

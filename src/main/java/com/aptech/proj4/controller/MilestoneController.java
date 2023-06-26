@@ -28,7 +28,6 @@ import com.aptech.proj4.model.Project;
 import com.aptech.proj4.model.TeamMember;
 import com.aptech.proj4.model.TeamMemberRole;
 import com.aptech.proj4.service.MilestoneService;
-import com.aptech.proj4.service.ProjectService;
 
 @RestController
 @RequestMapping("/milestone")
