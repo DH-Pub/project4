@@ -120,6 +120,7 @@ public class UserController {
     public ResponseEntity<?> getPersonalAccount(Authentication authentication) {
         try {
             UserDto user = userService.findUserByEmail(authentication.getPrincipal().toString());
+            user.setPassword(null);
             return ResponseEntity.ok(user);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());

@@ -69,12 +69,12 @@ public class TeamController {
         }
     }
 
-    @GetMapping("/user/{id}")
-    public ResponseEntity<?> getAllUserTeams(@PathVariable String id, Authentication authentication) {
+    @GetMapping("/user")
+    public ResponseEntity<?> getAllUserTeams(Authentication authentication) {
         try {
             UserDto user = userService.findUserByEmail(authentication.getPrincipal().toString());
             if (user != null) {
-                return ResponseEntity.ok(teamService.getAllUserTeams(id));
+                return ResponseEntity.ok(teamService.getAllUserTeams(user.getId()));
             }
             return ResponseEntity.status(HttpStatusCode.valueOf(403)).body("Your account does not exist");
         } catch (Exception e) {
