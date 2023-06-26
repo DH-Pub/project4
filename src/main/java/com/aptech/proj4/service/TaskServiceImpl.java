@@ -54,6 +54,13 @@ public class TaskServiceImpl implements TaskService {
             User returnUser = resUser.get();
             users.add(returnUser);
         });
+        if (files == null) {
+            taskDto.setFiles(null);
+        }
+        Arrays.asList(files).stream().forEach(file -> {
+            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+            fileNames.add(fileName);
+        });
         task.setId(taskDto.getId())
                 .setTaskName(taskDto.getTaskName())
                 .setDescription(taskDto.getDescription())
@@ -67,14 +74,9 @@ public class TaskServiceImpl implements TaskService {
                 .setDueDate(taskDto.getDueDate())
                 .setStatus(taskDto.getStatus())
                 .setMilestone(taskDto.getMilestone())
-                .setPosition(taskDto.getPosition());
-        if (files == null) {
-            taskDto.setFiles(null);
-        }
-        Arrays.asList(files).stream().forEach(file -> {
-            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-            fileNames.add(fileName);
-        });
+                .setPosition(taskDto.getPosition())
+                .setFiles(fileNames.toString());
+        
         taskDto.setFiles(fileNames);
         if (taskRepository.save(task) != null) { // If save task successfully
             /* save data into assignees table */
