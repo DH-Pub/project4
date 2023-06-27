@@ -92,11 +92,14 @@ public class Task implements Serializable{
     @Column(name = "created_at", columnDefinition = "DATETIME")
     private String createAt;
 
-    @ManyToMany()
+    @ManyToOne
     @JoinTable(
         name = "assignees",
         joinColumns = @JoinColumn(name = "task_id"),
         inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private List<User> users;
+    private User users;
+
+    @Column(name = "parent_task")
+    private String parentTask;
 }

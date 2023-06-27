@@ -49,11 +49,9 @@ public class TaskServiceImpl implements TaskService {
         List<String> fileNames = new ArrayList<>();
 
         /* Get assignee users */
-        taskDto.getUsers().forEach(user -> {
-            Optional<User> resUser = userRepository.findById(user.getId());
+            Optional<User> resUser = userRepository.findById(taskDto.getUsers().getId());
             User returnUser = resUser.get();
             users.add(returnUser);
-        });
         if (files == null) {
             taskDto.setFiles(null);
         }
@@ -75,7 +73,8 @@ public class TaskServiceImpl implements TaskService {
                 .setStatus(taskDto.getStatus())
                 .setMilestone(taskDto.getMilestone())
                 .setPosition(taskDto.getPosition())
-                .setFiles(fileNames.toString());
+                .setFiles(fileNames.toString())
+                .setParentTask(taskDto.getParentTask());
         
         taskDto.setFiles(fileNames);
         if (taskRepository.save(task) != null) { // If save task successfully

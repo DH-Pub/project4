@@ -34,10 +34,10 @@ public class Milestone implements Serializable {
     @Column(name = "description")
     private String description;
 
-    @Column(name = "[from]")
+    @Column(name = "from_date")
     private String from;
 
-    @Column(name = "[to]")
+    @Column(name = "to_date")
     private String to;
 
     @ManyToOne

@@ -1,6 +1,7 @@
 package com.aptech.proj4.model;
 
 import java.io.Serializable;
+import java.util.List;
 
 import org.hibernate.annotations.CreationTimestamp;
 
@@ -11,6 +12,7 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.Id;
+import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -51,4 +53,7 @@ public class User implements Serializable {
     @CreationTimestamp
     @Column(name = "created_at", columnDefinition = "DATETIME")
     private String createdAt;
+
+    @OneToMany
+    private List<Task> task;
 }
