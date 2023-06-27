@@ -39,7 +39,7 @@ public class TeamServiceImpl implements TeamService {
                 .setDescription(teamDto.getDescription());
         teamRepository.save(team);
 
-        teamDto.setId(team.getId()).setCreatedAt(team.getCreatedAt());
+        teamDto.setId(team.getId());
         User user = userRepository.findByEmail(creatingUser)
                 .orElseThrow(() -> new NoSuchElementException("User does not exist"));
 
