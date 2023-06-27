@@ -49,10 +49,15 @@ public class TaskServiceImpl implements TaskService {
         List<String> fileNames = new ArrayList<>();
 
         /* Get assignee users */
-        taskDto.getUsers().forEach(user -> {
-            Optional<User> resUser = userRepository.findById(user.getId());
+            Optional<User> resUser = userRepository.findById(taskDto.getUsers().getId());
             User returnUser = resUser.get();
             users.add(returnUser);
+        if (files == null) {
+            taskDto.setFiles(null);
+        }
+        Arrays.asList(files).stream().forEach(file -> {
+            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+            fileNames.add(fileName);
         });
         task.setId(taskDto.getId())
                 .setTaskName(taskDto.getTaskName())
@@ -67,14 +72,10 @@ public class TaskServiceImpl implements TaskService {
                 .setDueDate(taskDto.getDueDate())
                 .setStatus(taskDto.getStatus())
                 .setMilestone(taskDto.getMilestone())
-                .setPosition(taskDto.getPosition());
-        if (files == null) {
-            taskDto.setFiles(null);
-        }
-        Arrays.asList(files).stream().forEach(file -> {
-            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-            fileNames.add(fileName);
-        });
+                .setPosition(taskDto.getPosition())
+                .setFiles(fileNames.toString())
+                .setParentTask(taskDto.getParentTask());
+        
         taskDto.setFiles(fileNames);
         if (taskRepository.save(task) != null) { // If save task successfully
             /* save data into assignees table */

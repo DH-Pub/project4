@@ -35,7 +35,8 @@ public class TaskDto {
     private String statusUpdateAt;
     private Milestone milestone;
     private int position;
-    private List<User> users;
+    private User users;
     private String version;
+    private String parentTask;
     // private String createdBy;
 }
