@@ -26,6 +26,7 @@ import com.aptech.proj4.dto.TeamMemberDto;
 import com.aptech.proj4.dto.UserDto;
 import com.aptech.proj4.enums.TeamMemberRole;
 import com.aptech.proj4.enums.UserRole;
+import com.aptech.proj4.model.TeamMember;
 import com.aptech.proj4.service.TeamService;
 import com.aptech.proj4.service.UserService;
 
@@ -181,10 +182,11 @@ public class TeamController {
         }
     }
 
-    @DeleteMapping("/remove-member")
-    public ResponseEntity<?> removeMember(Authentication authentication, @RequestBody TeamMemberDto teamMemberDto) {
+    @DeleteMapping("/remove-member/{id}")
+    public ResponseEntity<?> removeMember(Authentication authentication, @PathVariable long id) {
         try {
-            TeamMemberDetailDto member = teamService.getMemberDetailByEmail(teamMemberDto.getTeamId(),
+            TeamMember removedMember = teamService.getMember(id);
+            TeamMemberDetailDto member = teamService.getMemberDetailByEmail(removedMember.getTeam().getId(),
                     authentication.getPrincipal().toString());
 
             TeamMemberRole memberRole = member.getTeamMemberRole();
@@ -192,7 +194,7 @@ public class TeamController {
                     || memberRole.equals(TeamMemberRole.ADMINISTRATOR)
                     // allow self-removal
                     || member.getEmail().equals(authentication.getPrincipal().toString())) {
-                return ResponseEntity.ok(teamService.removeMember(teamMemberDto.getId()));
+                return ResponseEntity.ok(teamService.removeMember(removedMember.getId()));
             }
             return ResponseEntity.status(HttpStatusCode.valueOf(403)).body("You do not have permission.");
         } catch (Exception e) {
@@ -201,7 +203,7 @@ public class TeamController {
     }
 
     @PutMapping("/change-member-role")
-    public ResponseEntity<?> changeMemberROle(Authentication authentication,
+    public ResponseEntity<?> changeMemberRole(Authentication authentication,
             @RequestBody TeamMemberDto teamMemberDto) {
         try {
             if (teamMemberDto.getRole().equals(TeamMemberRole.CREATOR.toString())) {

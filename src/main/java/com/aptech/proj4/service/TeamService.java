@@ -7,6 +7,7 @@ import com.aptech.proj4.dto.TeamMemberDetailDto;
 import com.aptech.proj4.dto.TeamMemberDto;
 import com.aptech.proj4.dto.UserTeamDto;
 import com.aptech.proj4.model.Team;
+import com.aptech.proj4.model.TeamMember;
 
 public interface TeamService {
     TeamDto createTeam(TeamDto team, String creatingUser);
@@ -25,7 +26,7 @@ public interface TeamService {
 
     boolean removeMember(long id);
 
-    TeamMemberDto getMember(String memberUserId, String teamId);
+    TeamMember getMember(long id);
 
     /**
      * Return the list of members and their details

@@ -135,9 +135,8 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public TeamMemberDto getMember(String memberUserId, String teamId) {
-        // TODO Auto-generated method stub
-        throw new UnsupportedOperationException("Unimplemented method 'getMember'");
+    public TeamMember getMember(long id) {
+        return memberRepository.findById(id).orElseThrow(() -> new NoSuchElementException("Member not found"));
     }
 
     @Override
