@@ -6,6 +6,7 @@ import org.hibernate.annotations.CreationTimestamp;
 
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.Id;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
@@ -33,8 +34,8 @@ public class Project implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @ManyToOne()
-    @JoinColumn(name = "team_id"  )
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "team_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
     private Team team;
@@ -43,7 +44,7 @@ public class Project implements Serializable {
     @Column(name = "created_at", columnDefinition = "DATETIME")
     private String createdAt;
 
-    //  @OneToMany(mappedBy="project", cascade = CascadeType.ALL)
+    // @OneToMany(mappedBy="project", cascade = CascadeType.ALL)
     // private Set<Milestone> milestones;
 
 }
