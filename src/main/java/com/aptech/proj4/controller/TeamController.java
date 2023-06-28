@@ -186,14 +186,14 @@ public class TeamController {
     public ResponseEntity<?> removeMember(Authentication authentication, @PathVariable long id) {
         try {
             TeamMember removedMember = teamService.getMember(id);
-            TeamMemberDetailDto member = teamService.getMemberDetailByEmail(removedMember.getTeam().getId(),
+            TeamMemberDetailDto removingMember = teamService.getMemberDetailByEmail(removedMember.getTeam().getId(),
                     authentication.getPrincipal().toString());
 
-            TeamMemberRole memberRole = member.getTeamMemberRole();
+            TeamMemberRole memberRole = removingMember.getTeamMemberRole();
             if (memberRole.equals(TeamMemberRole.CREATOR)
                     || memberRole.equals(TeamMemberRole.ADMINISTRATOR)
                     // allow self-removal
-                    || member.getEmail().equals(authentication.getPrincipal().toString())) {
+                    || removingMember.getEmail().equals(authentication.getPrincipal().toString())) {
                 return ResponseEntity.ok(teamService.removeMember(removedMember.getId()));
             }
             return ResponseEntity.status(HttpStatusCode.valueOf(403)).body("You do not have permission.");
