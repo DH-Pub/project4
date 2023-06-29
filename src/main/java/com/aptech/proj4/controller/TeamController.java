@@ -21,6 +21,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aptech.proj4.dto.TeamDto;
+import com.aptech.proj4.dto.TeamMemberAddDto;
 import com.aptech.proj4.dto.TeamMemberDetailDto;
 import com.aptech.proj4.dto.TeamMemberDto;
 import com.aptech.proj4.dto.UserDto;
@@ -161,8 +162,13 @@ public class TeamController {
     }
 
     @PostMapping("/add-member")
-    public ResponseEntity<?> addMember(Authentication authentication, @RequestBody TeamMemberDto teamMemberDto) {
+    public ResponseEntity<?> addMember(Authentication authentication, @RequestBody TeamMemberAddDto teamMemberAddDto) {
         try {
+            UserDto userDto = userService.findUserByEmail(teamMemberAddDto.getEmail());
+            TeamMemberDto teamMemberDto = new TeamMemberDto()
+                    .setUserId(userDto.getId())
+                    .setTeamId(teamMemberAddDto.getTeamId())
+                    .setRole(teamMemberAddDto.getRole());
             if (teamMemberDto.getRole().equals(TeamMemberRole.CREATOR.toString())) {
                 return ResponseEntity.status(HttpStatusCode.valueOf(403))
                         .body("Cannot assign role CREATOR to new member.");
