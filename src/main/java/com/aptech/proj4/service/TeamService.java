@@ -18,7 +18,7 @@ public interface TeamService {
 
     List<UserTeamDto> getAllUserTeams(String userId);
 
-    TeamDto updateTeam(TeamDto team);
+    Team updateTeam(TeamDto team);
 
     boolean deleteTeam(String id);
 

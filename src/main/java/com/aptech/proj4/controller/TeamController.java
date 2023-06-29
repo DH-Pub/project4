@@ -161,6 +161,23 @@ public class TeamController {
         }
     }
 
+    @GetMapping("/{id}/current-member")
+    public ResponseEntity<?> getCurrentMember(Authentication authentication, @PathVariable String id) {
+        try {
+            // check if user is in the team
+            List<TeamMemberDetailDto> teamMembers = teamService.getAllMembersDetails(id);
+            String user = authentication.getPrincipal().toString();
+            Optional<TeamMemberDetailDto> member = teamMembers.stream().filter(m -> m.getEmail().equals(user))
+                    .findFirst();
+            if (member.isPresent()) {
+                return ResponseEntity.ok(member);
+            }
+            return ResponseEntity.status(HttpStatusCode.valueOf(403)).body("You do not have permission.");
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+        }
+    }
+
     @PostMapping("/add-member")
     public ResponseEntity<?> addMember(Authentication authentication, @RequestBody TeamMemberAddDto teamMemberAddDto) {
         try {

@@ -71,14 +71,13 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public TeamDto updateTeam(TeamDto teamDto) {
+    public Team updateTeam(TeamDto teamDto) {
         Team updatedTeam = modelMapper.map(teamDto, Team.class);
         try {
-            teamRepository.save(updatedTeam);
+            return teamRepository.save(updatedTeam);
         } catch (Exception e) {
             return null;
         }
-        return teamDto;
     }
 
     @Override
