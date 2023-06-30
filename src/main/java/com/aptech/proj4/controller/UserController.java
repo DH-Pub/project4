@@ -169,6 +169,7 @@ public class UserController {
             } else {
                 result = userService.updateUser(user);
             }
+            result.setPassword(null);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
