@@ -44,21 +44,17 @@ public class TaskServiceImpl implements TaskService {
     public boolean createTask(MultipartFile[] files, TaskDto taskDto, String creatingUser) {
         Task task = new Task();
         SubmitDto submitDto = new SubmitDto();
-        List<User> users = new ArrayList<User>();
-        // List<String> files = taskDto.getFiles();
         List<String> fileNames = new ArrayList<>();
 
-        /* Get assignee users */
-            Optional<User> resUser = userRepository.findById(taskDto.getUsers().getId());
-            User returnUser = resUser.get();
-            users.add(returnUser);
         if (files == null) {
             taskDto.setFiles(null);
+        } else {
+            Arrays.asList(files).stream().forEach(file -> {
+                String fileName = StringUtils.cleanPath(file.getOriginalFilename());
+                fileNames.add(fileName);
+            });
+            taskDto.setFiles(fileNames);
         }
-        Arrays.asList(files).stream().forEach(file -> {
-            String fileName = StringUtils.cleanPath(file.getOriginalFilename());
-            fileNames.add(fileName);
-        });
         task.setId(taskDto.getId())
                 .setTaskName(taskDto.getTaskName())
                 .setDescription(taskDto.getDescription())
@@ -71,16 +67,13 @@ public class TaskServiceImpl implements TaskService {
                 .setEndDate(taskDto.getEndDate())
                 .setDueDate(taskDto.getDueDate())
                 .setStatus(taskDto.getStatus())
-                .setMilestone(taskDto.getMilestone())
+                .setProject(taskDto.getProject())
                 .setPosition(taskDto.getPosition())
                 .setFiles(fileNames.toString())
                 .setParentTask(taskDto.getParentTask());
-        
-        taskDto.setFiles(fileNames);
         if (taskRepository.save(task) != null) { // If save task successfully
             /* save data into assignees table */
-            for (User user : users) {
-                User assigneeUser = userRepository.findById(user.getId()).orElse(null);
+                User assigneeUser = userRepository.findById(taskDto.getUsers().getId()).get();
                 if (assigneeUser != null) {
                     Assignee assignee = new Assignee();
                     assignee.setTask(task);
@@ -88,23 +81,23 @@ public class TaskServiceImpl implements TaskService {
                     assignee.setAddedUser(userRepository.findByEmail(creatingUser).get().getId());
                     assigneeRepository.save(assignee);
                 }
-            }
+            // }
 
             /* save data into submits table */
-            if(files != null) {
+            if (files != null) {
                 String uploadDir = "documents/submit";
                 for (MultipartFile file : files) {
                     String originalFilename = file.getOriginalFilename();
                     String randomPrefix = UUID.randomUUID().toString(); // Random code
                     String fileName = randomPrefix + "_" + StringUtils.cleanPath(originalFilename);
                     submitDto.setAttached(fileName);
-                    if(submitService.uploadSubmit(submitDto, taskDto.getId()) != null) {
+                    if (submitService.uploadSubmit(submitDto, taskDto.getId()) != null) {
                         try {
                             FileUploadUtil.saveFile(uploadDir, fileName, file);
                         } catch (IOException e) {
                             e.printStackTrace();
                         }
-                    } 
+                    }
                 }
             }
             return true;
