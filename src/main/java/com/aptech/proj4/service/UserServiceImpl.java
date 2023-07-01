@@ -103,7 +103,6 @@ public class UserServiceImpl implements UserService {
     public UserDto getUser(String id) {
         Optional<User> user = Optional.ofNullable(userRepository.findById(id).get());
         if (user.isPresent()) {
-            user.get().setPassword(null);
             return modelMapper.map(user.get(), UserDto.class);
         }
         throw new RuntimeException("User does not exist.");
