@@ -34,7 +34,7 @@ public class Project implements Serializable {
     @Column(name = "name")
     private String name;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "team_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude

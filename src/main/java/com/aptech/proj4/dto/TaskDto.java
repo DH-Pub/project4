@@ -4,7 +4,7 @@ import java.util.List;
 
 import com.aptech.proj4.enums.TaskCategory;
 import com.aptech.proj4.enums.TaskPriority;
-import com.aptech.proj4.model.Milestone;
+import com.aptech.proj4.model.Project;
 import com.aptech.proj4.model.User;
 
 import lombok.AllArgsConstructor;
@@ -33,7 +33,7 @@ public class TaskDto {
     private List<String> files;
     private String status;
     private String statusUpdateAt;
-    private Milestone milestone;
+    private Project project;
     private int position;
     private User users;
     private String version;

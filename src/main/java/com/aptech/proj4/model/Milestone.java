@@ -41,7 +41,7 @@ public class Milestone implements Serializable {
     @Column(name = "to_date")
     private String to;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne
     @JoinColumn(name = "projects_id")
     @EqualsAndHashCode.Exclude
     @ToString.Exclude
