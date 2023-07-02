@@ -5,7 +5,6 @@ import java.util.List;
 import com.aptech.proj4.enums.TaskCategory;
 import com.aptech.proj4.enums.TaskPriority;
 import com.aptech.proj4.model.Project;
-import com.aptech.proj4.model.User;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -35,8 +34,7 @@ public class TaskDto {
     private String statusUpdateAt;
     private Project project;
     private int position;
-    private User users;
+    private String user;
     private String version;
     private String parentTask;
-    // private String createdBy;
 }

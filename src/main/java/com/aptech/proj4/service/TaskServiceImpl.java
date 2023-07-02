@@ -7,6 +7,9 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
+import java.util.HashSet;
+import java.util.Random;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -45,6 +48,19 @@ public class TaskServiceImpl implements TaskService {
         SubmitDto submitDto = new SubmitDto();
         List<String> fileNames = new ArrayList<>();
 
+        /* Generate a non-duplicate random string for task.setId() */
+        String characters = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ1234567890";
+        Random random = new Random();
+        StringBuilder sb = new StringBuilder();
+        Set<String> uniqueStrings = new HashSet<>();
+        while (sb.length() < 10) {
+            int index = random.nextInt(characters.length());
+            String randomChar = String.valueOf(characters.charAt(index));
+            if (uniqueStrings.add(randomChar)) {
+                sb.append(randomChar);
+            }
+        }
+
         if (files == null) {
             taskDto.setFiles(null);
         } else {
@@ -54,7 +70,7 @@ public class TaskServiceImpl implements TaskService {
             });
             taskDto.setFiles(fileNames);
         }
-        task.setId(taskDto.getId())
+        task.setId(sb.toString())
                 .setTaskName(taskDto.getTaskName())
                 .setDescription(taskDto.getDescription())
                 .setBrief(taskDto.getBrief())
@@ -72,7 +88,7 @@ public class TaskServiceImpl implements TaskService {
                 .setParentTask(taskDto.getParentTask());
         if (taskRepository.save(task) != null) { // If save task successfully
             /* save data into assignees table */
-                User assigneeUser = userRepository.findById(taskDto.getUsers().getId()).get();
+                User assigneeUser = userRepository.findById(taskDto.getUser()).get();
                 if (assigneeUser != null) {
                     Assignee assignee = new Assignee();
                     assignee.setTask(task);
@@ -90,7 +106,7 @@ public class TaskServiceImpl implements TaskService {
                     String randomPrefix = UUID.randomUUID().toString(); // Random code
                     String fileName = randomPrefix + "_" + StringUtils.cleanPath(originalFilename);
                     submitDto.setAttached(fileName);
-                    if (submitService.uploadSubmit(submitDto, taskDto.getId()) != null) {
+                    if (submitService.uploadSubmit(submitDto, sb.toString()) != null) {
                         try {
                             FileUploadUtil.saveFile(uploadDir, fileName, file);
                         } catch (IOException e) {
