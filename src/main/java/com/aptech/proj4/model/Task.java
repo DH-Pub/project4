@@ -96,7 +96,7 @@ public class Task implements Serializable{
         joinColumns = @JoinColumn(name = "task_id"),
         inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private User users;
+    private User user;
 
     @Column(name = "parent_task")
     private String parentTask;
