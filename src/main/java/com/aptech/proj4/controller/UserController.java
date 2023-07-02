@@ -103,14 +103,22 @@ public class UserController {
     @GetMapping("/all-users")
     @PreAuthorize("hasAnyAuthority('MAIN', 'ADMIN')")
     public ResponseEntity<?> getAllUser() {
-        List<User> users = userService.getAllUser();
-        return ResponseEntity.ok(users);
+        try {
+            List<User> users = userService.getAllUser();
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @PostMapping("/admin-role")
     @PreAuthorize("hasAnyAuthority('MAIN')")
     public ResponseEntity<?> changeAdminRole(@RequestBody UserDto userDto) {
-        return ResponseEntity.ok(userService.changeAdminRole(userDto));
+        try {
+            return ResponseEntity.ok(userService.changeAdminRole(userDto));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/account")
