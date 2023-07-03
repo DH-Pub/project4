@@ -32,7 +32,6 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
   public Authentication attemptAuthentication(HttpServletRequest req, HttpServletResponse res)
       throws AuthenticationException {
     try {
-
       LoginRequest user = new ObjectMapper().readValue(req.getInputStream(), LoginRequest.class);
       return authenticationManager.authenticate(
           (new UsernamePasswordAuthenticationToken(user.getUsername(), user.getPassword(),
@@ -41,23 +40,19 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     } catch (Exception e) {
       throw new RuntimeException(e.getMessage());
     }
-
   }
 
   @Override
   protected void successfulAuthentication(HttpServletRequest req, HttpServletResponse res, FilterChain chain,
       Authentication auth) throws IOException {
-
     if (auth.getPrincipal() != null) {
       org.springframework.security.core.userdetails.User user = (org.springframework.security.core.userdetails.User) auth
           .getPrincipal();
       String login = user.getUsername();
       if (login != null && login.length() > 0) {
-
         String accessTokenJson = new ObjectMapper().writeValueAsString(jwtUtils.generateToken(auth));
         res.setContentType("application/json");
         res.getWriter().write(accessTokenJson);
-
       }
     }
   }

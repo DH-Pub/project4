@@ -90,7 +90,7 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean changeAdminRole(UserDto userDto) {
         if (userDto.getEmail() == SecurityConstants.MAIN_EMAIL) {
-            return false;
+            throw new RuntimeException("Cannot change this account's role");
         }
         User user = userRepository.findByEmail(userDto.getEmail())
                 .orElseThrow(() -> new NoSuchElementException("Email not found."));
@@ -117,11 +117,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean changePassword(UserDto userDto, PasswordDto passwordDto) {
-        User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() -> new NoSuchElementException("Email not found."));
+        User user = userRepository.findByEmail(userDto.getEmail())
+                .orElseThrow(() -> new NoSuchElementException("Email not found."));
         if (passwordEncoder.matches(passwordDto.getOldPassword(), user.getPassword())) {
             user.setPassword(passwordEncoder.encode(passwordDto.getNewPassword()));
             userRepository.save(user);
-        }else{
+        } else {
             throw new RuntimeException("Wrong password.");
         }
         return true;
@@ -129,8 +130,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean deleteUser(String id) {
-        User user = userRepository.findById(id).orElseThrow(()-> new NoSuchElementException("User id not found."));
-        if(user.getRole() == UserRole.MAIN){
+        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("User id not found."));
+        if (user.getRole() == UserRole.MAIN) {
             return false;
         }
         userRepository.delete(user);

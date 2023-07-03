@@ -111,7 +111,7 @@ public class UserController {
         }
     }
 
-    @PostMapping("/admin-role")
+    @PutMapping("/admin-role")
     @PreAuthorize("hasAnyAuthority('MAIN')")
     public ResponseEntity<?> changeAdminRole(@RequestBody UserDto userDto) {
         try {
