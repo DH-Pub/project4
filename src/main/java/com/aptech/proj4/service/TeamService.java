@@ -1,6 +1,7 @@
 package com.aptech.proj4.service;
 
 import java.util.List;
+import java.util.Optional;
 
 import com.aptech.proj4.dto.TeamDto;
 import com.aptech.proj4.dto.TeamMemberDetailDto;
@@ -43,7 +44,7 @@ public interface TeamService {
      * @param email
      * 
      */
-    TeamMemberDetailDto getMemberDetailByEmail(String teamId, String email);
+    Optional<TeamMemberDetailDto> getMemberDetailByEmail(String teamId, String email);
 
     TeamMemberDto changeMemberRole(TeamMemberDto teamMemberDto);
 }

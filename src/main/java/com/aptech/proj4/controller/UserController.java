@@ -112,9 +112,22 @@ public class UserController {
     }
 
     @PutMapping("/admin-role")
-    @PreAuthorize("hasAnyAuthority('MAIN')")
-    public ResponseEntity<?> changeAdminRole(@RequestBody UserDto userDto) {
+    @PreAuthorize("hasAnyAuthority('MAIN','ADMIN')")
+    public ResponseEntity<?> changeAdminRole(@RequestBody UserDto userDto, Authentication authentication) {
         try {
+            UserDto changingUser = userService.findUserByEmail(authentication.getPrincipal().toString());
+            UserDto user = userService.findUserByEmail(userDto.getEmail());
+            if (changingUser.getRole().equals(UserRole.ADMIN.toString())
+                    && user.getRole().equals(UserRole.MAIN.toString())) {
+                return ResponseEntity.badRequest().body("You don't have authority over this account");
+            }
+
+            // change Role auth
+            boolean isAdmin = changingUser.getRole().equals(UserRole.ADMIN.toString());
+            boolean adminAuth = userDto.getRole().equals(UserRole.MAIN.toString());
+            if (isAdmin && adminAuth) {
+                return ResponseEntity.badRequest().body("You don't have authority to change role to MAIN");
+            }
             return ResponseEntity.ok(userService.changeAdminRole(userDto));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
@@ -195,6 +208,13 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('MAIN', 'ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable String id, Authentication authentication) {
         try {
+            UserDto deletingUser = userService.findUserByEmail(authentication.getPrincipal().toString());
+            UserDto user = userService.getUser(id);
+            if (deletingUser.getRole().equals(UserRole.ADMIN.toString())
+                    && user.getRole().equals(UserRole.MAIN.toString())) {
+                return ResponseEntity.badRequest().body("You don't have authority over this account");
+            }
+            deleteImage(user.getId(), authentication);
             return ResponseEntity.ok(userService.deleteUser(id));
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());

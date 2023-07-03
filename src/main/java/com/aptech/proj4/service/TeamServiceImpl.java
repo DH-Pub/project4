@@ -145,9 +145,8 @@ public class TeamServiceImpl implements TeamService {
     }
 
     @Override
-    public TeamMemberDetailDto getMemberDetailByEmail(String teamId, String email) {
-        TeamMemberDetailDto member = memberRepository.getMemberDetailsByEmail(teamId, email)
-                .orElseThrow(() -> new NoSuchElementException("This user is not a member of the team"));
+    public Optional<TeamMemberDetailDto> getMemberDetailByEmail(String teamId, String email) {
+        Optional<TeamMemberDetailDto> member = memberRepository.getMemberDetailsByEmail(teamId, email);
         return member;
     }
 

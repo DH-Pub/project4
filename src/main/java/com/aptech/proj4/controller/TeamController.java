@@ -51,9 +51,9 @@ public class TeamController {
     @GetMapping("/{id}")
     public ResponseEntity<?> getTeam(@PathVariable String id, Authentication authentication) {
         try {
-            TeamMemberDetailDto member = teamService.getMemberDetailByEmail(id,
+            Optional<TeamMemberDetailDto> member = teamService.getMemberDetailByEmail(id,
                     authentication.getPrincipal().toString());
-            if (member != null) {
+            if (member.isPresent()) {
                 return ResponseEntity.ok(teamService.getTeam(id));
             }
 
@@ -98,9 +98,9 @@ public class TeamController {
     public ResponseEntity<?> updateTeam(Authentication authentication,
             @RequestBody TeamDto teamDto) {
         try {
-            TeamMemberDetailDto member = teamService.getMemberDetailByEmail(teamDto.getId(),
+            Optional<TeamMemberDetailDto> member = teamService.getMemberDetailByEmail(teamDto.getId(),
                     authentication.getPrincipal().toString());
-            if (member != null && member.getTeamMemberRole().equals(TeamMemberRole.CREATOR)) {
+            if (member.isPresent() && member.get().getTeamMemberRole().equals(TeamMemberRole.CREATOR)) {
                 return ResponseEntity.ok(teamService.updateTeam(teamDto));
             }
             return ResponseEntity.status(HttpStatusCode.valueOf(403))
@@ -113,9 +113,10 @@ public class TeamController {
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<?> deleteTeam(@PathVariable String id, Authentication authentication) {
         try {
-            TeamMemberDetailDto member = teamService.getMemberDetailByEmail(id,
+            Optional<TeamMemberDetailDto> member = teamService.getMemberDetailByEmail(id,
                     authentication.getPrincipal().toString());
-            if (member != null && member.getTeamMemberRole().equals(TeamMemberRole.CREATOR)) {
+
+            if (member.isPresent() && member.get().getTeamMemberRole().equals(TeamMemberRole.CREATOR)) {
                 return ResponseEntity.ok(teamService.deleteTeam(id));
             }
 
@@ -190,10 +191,10 @@ public class TeamController {
                 return ResponseEntity.status(HttpStatusCode.valueOf(403))
                         .body("Cannot assign role CREATOR to new member.");
             }
-            TeamMemberDetailDto member = teamService.getMemberDetailByEmail(teamMemberDto.getTeamId(),
+            Optional<TeamMemberDetailDto> member = teamService.getMemberDetailByEmail(teamMemberDto.getTeamId(),
                     authentication.getPrincipal().toString());
 
-            TeamMemberRole memberRole = member.getTeamMemberRole();
+            TeamMemberRole memberRole = member.get().getTeamMemberRole();
             if (memberRole.equals(TeamMemberRole.CREATOR)
                     || memberRole.equals(TeamMemberRole.ADMINISTRATOR)) {
                 return ResponseEntity
@@ -209,14 +210,15 @@ public class TeamController {
     public ResponseEntity<?> removeMember(Authentication authentication, @PathVariable long id) {
         try {
             TeamMember removedMember = teamService.getMember(id);
-            TeamMemberDetailDto removingMember = teamService.getMemberDetailByEmail(removedMember.getTeam().getId(),
+            Optional<TeamMemberDetailDto> removingMember = teamService.getMemberDetailByEmail(
+                    removedMember.getTeam().getId(),
                     authentication.getPrincipal().toString());
 
-            TeamMemberRole memberRole = removingMember.getTeamMemberRole();
+            TeamMemberRole memberRole = removingMember.get().getTeamMemberRole();
             if (memberRole.equals(TeamMemberRole.CREATOR)
                     || memberRole.equals(TeamMemberRole.ADMINISTRATOR)
                     // allow self-removal
-                    || removingMember.getEmail().equals(authentication.getPrincipal().toString())) {
+                    || removingMember.get().getEmail().equals(authentication.getPrincipal().toString())) {
                 return ResponseEntity.ok(teamService.removeMember(removedMember.getId()));
             }
             return ResponseEntity.status(HttpStatusCode.valueOf(403)).body("You do not have permission.");
@@ -232,9 +234,9 @@ public class TeamController {
             if (teamMemberDto.getRole().equals(TeamMemberRole.CREATOR.toString())) {
                 return ResponseEntity.status(HttpStatusCode.valueOf(403)).body("Cannot change role into CREATOR.");
             }
-            TeamMemberDetailDto member = teamService.getMemberDetailByEmail(teamMemberDto.getTeamId(),
+            Optional<TeamMemberDetailDto> member = teamService.getMemberDetailByEmail(teamMemberDto.getTeamId(),
                     authentication.getPrincipal().toString());
-            TeamMemberRole memberRole = member.getTeamMemberRole();
+            TeamMemberRole memberRole = member.get().getTeamMemberRole();
             if (memberRole.equals(TeamMemberRole.CREATOR)
                     || memberRole.equals(TeamMemberRole.ADMINISTRATOR)) {
                 return ResponseEntity.ok(teamService.changeMemberRole(teamMemberDto));

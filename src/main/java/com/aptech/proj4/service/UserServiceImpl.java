@@ -40,8 +40,9 @@ public class UserServiceImpl implements UserService {
             newUser.setPic(pic);
             userRepository.save(newUser);
 
-            userDto.setPassword("");
-            userDto.setPic(pic);
+            userDto.setId(newUser.getId())
+                    .setPassword("")
+                    .setPic(pic);
             return userDto;
         } else {
             throw new RuntimeException("email already exists.");
@@ -79,8 +80,9 @@ public class UserServiceImpl implements UserService {
             newUser.setPic(pic);
             userRepository.save(newUser);
 
-            userDto.setPassword(null);
-            userDto.setPic(pic);
+            userDto.setId(newUser.getId())
+                    .setPassword(null)
+                    .setPic(pic);
             return userDto;
         } else {
             throw new RuntimeException("email already exists.");
@@ -89,7 +91,7 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean changeAdminRole(UserDto userDto) {
-        if (userDto.getEmail() == SecurityConstants.MAIN_EMAIL) {
+        if (userDto.getEmail().equals(SecurityConstants.MAIN_EMAIL)) {
             throw new RuntimeException("Cannot change this account's role");
         }
         User user = userRepository.findByEmail(userDto.getEmail())
@@ -131,8 +133,8 @@ public class UserServiceImpl implements UserService {
     @Override
     public boolean deleteUser(String id) {
         User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("User id not found."));
-        if (user.getRole() == UserRole.MAIN) {
-            return false;
+        if (user.getRole().equals(UserRole.MAIN)) {
+            throw new RuntimeException("MAIN role cannot be deleted");
         }
         userRepository.delete(user);
         return true;
