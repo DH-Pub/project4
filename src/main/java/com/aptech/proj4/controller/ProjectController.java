@@ -49,7 +49,7 @@ public class ProjectController {
         }
     }
 
-    @GetMapping
+    @GetMapping("/getAll")
     public ResponseEntity<List<ProjectDto>> getAllProjects() {
         List<Project> projects = projectService.getAllProjects();
         List<ProjectDto> dtos = new ArrayList<>();
