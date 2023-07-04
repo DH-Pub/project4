@@ -19,9 +19,11 @@ import org.springframework.web.multipart.MultipartFile;
 import com.aptech.proj4.dto.SubmitDto;
 import com.aptech.proj4.dto.TaskDto;
 import com.aptech.proj4.model.Assignee;
+import com.aptech.proj4.model.Project;
 import com.aptech.proj4.model.Task;
 import com.aptech.proj4.model.User;
 import com.aptech.proj4.repository.AssigneeRepository;
+import com.aptech.proj4.repository.ProjectRepository;
 import com.aptech.proj4.repository.SubmitRepository;
 import com.aptech.proj4.repository.TaskRepository;
 import com.aptech.proj4.repository.UserRepository;
@@ -39,6 +41,8 @@ public class TaskServiceImpl implements TaskService {
     AssigneeRepository assigneeRepository;
     @Autowired
     SubmitRepository submitRepository;
+    @Autowired
+    ProjectRepository projectRepository;
     @Autowired
     SubmitService submitService;
 
@@ -128,6 +132,13 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
+    public List<Task> getTasksByProject(String projectId) {
+        Project project = projectRepository.findById(projectId).get();
+        List<Task> listTask = (List<Task>) taskRepository.findByProject(project);
+        return listTask;
+    }
+
+    @Override
     public TaskDto getTaskById(String id, String authentication) {
         TaskDto taskDto = new TaskDto();
         // Task task = taskRepository.findById(id).get();
@@ -153,4 +164,6 @@ public class TaskServiceImpl implements TaskService {
         // .setUsers(task.getUsers());
         return taskDto;
     }
+
+
 }
