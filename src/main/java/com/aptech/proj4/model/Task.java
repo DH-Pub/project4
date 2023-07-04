@@ -73,8 +73,8 @@ public class Task implements Serializable{
     private String statusUpdatedAt;
 
     @ManyToOne
-    @JoinColumn(name = "milestone_id") 
-    private Milestone milestone;
+    @JoinColumn(name = "project_id") 
+    private Project project;
 
     @Column(name = "position")
     private int position;
@@ -96,7 +96,7 @@ public class Task implements Serializable{
         joinColumns = @JoinColumn(name = "task_id"),
         inverseJoinColumns = @JoinColumn(name = "user_id")
     )
-    private User users;
+    private User user;
 
     @Column(name = "parent_task")
     private String parentTask;

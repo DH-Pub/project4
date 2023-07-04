@@ -40,8 +40,9 @@ public class UserServiceImpl implements UserService {
             newUser.setPic(pic);
             userRepository.save(newUser);
 
-            userDto.setPassword("");
-            userDto.setPic(pic);
+            userDto.setId(newUser.getId())
+                    .setPassword("")
+                    .setPic(pic);
             return userDto;
         } else {
             throw new RuntimeException("email already exists.");
@@ -79,8 +80,9 @@ public class UserServiceImpl implements UserService {
             newUser.setPic(pic);
             userRepository.save(newUser);
 
-            userDto.setPassword(null);
-            userDto.setPic(pic);
+            userDto.setId(newUser.getId())
+                    .setPassword(null)
+                    .setPic(pic);
             return userDto;
         } else {
             throw new RuntimeException("email already exists.");
@@ -89,8 +91,8 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean changeAdminRole(UserDto userDto) {
-        if (userDto.getEmail() == SecurityConstants.MAIN_EMAIL) {
-            return false;
+        if (userDto.getEmail().equals(SecurityConstants.MAIN_EMAIL)) {
+            throw new RuntimeException("Cannot change this account's role");
         }
         User user = userRepository.findByEmail(userDto.getEmail())
                 .orElseThrow(() -> new NoSuchElementException("Email not found."));
@@ -103,7 +105,6 @@ public class UserServiceImpl implements UserService {
     public UserDto getUser(String id) {
         Optional<User> user = Optional.ofNullable(userRepository.findById(id).get());
         if (user.isPresent()) {
-            user.get().setPassword(null);
             return modelMapper.map(user.get(), UserDto.class);
         }
         throw new RuntimeException("User does not exist.");
@@ -118,11 +119,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean changePassword(UserDto userDto, PasswordDto passwordDto) {
-        User user = userRepository.findByEmail(userDto.getEmail()).orElseThrow(() -> new NoSuchElementException("Email not found."));
+        User user = userRepository.findByEmail(userDto.getEmail())
+                .orElseThrow(() -> new NoSuchElementException("Email not found."));
         if (passwordEncoder.matches(passwordDto.getOldPassword(), user.getPassword())) {
             user.setPassword(passwordEncoder.encode(passwordDto.getNewPassword()));
             userRepository.save(user);
-        }else{
+        } else {
             throw new RuntimeException("Wrong password.");
         }
         return true;
@@ -130,9 +132,9 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public boolean deleteUser(String id) {
-        User user = userRepository.findById(id).orElseThrow(()-> new NoSuchElementException("User id not found."));
-        if(user.getRole() == UserRole.MAIN){
-            return false;
+        User user = userRepository.findById(id).orElseThrow(() -> new NoSuchElementException("User id not found."));
+        if (user.getRole().equals(UserRole.MAIN)) {
+            throw new RuntimeException("MAIN role cannot be deleted");
         }
         userRepository.delete(user);
         return true;

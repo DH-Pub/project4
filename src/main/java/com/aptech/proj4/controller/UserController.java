@@ -4,17 +4,14 @@ import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
-import java.util.Collection;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.ByteArrayResource;
-import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.util.StringUtils;
 import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -71,9 +68,9 @@ public class UserController {
             }
             return ResponseEntity.ok(user);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email already exists.");
+            return ResponseEntity.badRequest().body("Email already exists.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Could not upload picture.");
+            return ResponseEntity.badRequest().body("Could not upload picture.");
         }
     }
 
@@ -97,23 +94,44 @@ public class UserController {
             }
             return ResponseEntity.ok(admin);
         } catch (RuntimeException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Email already exists.");
+            return ResponseEntity.badRequest().body("Email already exists.");
         } catch (IOException e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Could not upload picture.");
+            return ResponseEntity.badRequest().body("Could not upload picture.");
         }
     }
 
     @GetMapping("/all-users")
     @PreAuthorize("hasAnyAuthority('MAIN', 'ADMIN')")
     public ResponseEntity<?> getAllUser() {
-        List<User> users = userService.getAllUser();
-        return ResponseEntity.ok(users);
+        try {
+            List<User> users = userService.getAllUser();
+            return ResponseEntity.ok(users);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
-    @PostMapping("/admin-role")
-    @PreAuthorize("hasAnyAuthority('MAIN')")
-    public ResponseEntity<?> changeAdminRole(@RequestBody UserDto userDto) {
-        return ResponseEntity.ok(userService.changeAdminRole(userDto));
+    @PutMapping("/admin-role")
+    @PreAuthorize("hasAnyAuthority('MAIN','ADMIN')")
+    public ResponseEntity<?> changeAdminRole(@RequestBody UserDto userDto, Authentication authentication) {
+        try {
+            UserDto changingUser = userService.findUserByEmail(authentication.getPrincipal().toString());
+            UserDto user = userService.findUserByEmail(userDto.getEmail());
+            if (changingUser.getRole().equals(UserRole.ADMIN.toString())
+                    && user.getRole().equals(UserRole.MAIN.toString())) {
+                return ResponseEntity.badRequest().body("You don't have authority over this account");
+            }
+
+            // change Role auth
+            boolean isAdmin = changingUser.getRole().equals(UserRole.ADMIN.toString());
+            boolean adminAuth = userDto.getRole().equals(UserRole.MAIN.toString());
+            if (isAdmin && adminAuth) {
+                return ResponseEntity.badRequest().body("You don't have authority to change role to MAIN");
+            }
+            return ResponseEntity.ok(userService.changeAdminRole(userDto));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 
     @GetMapping("/account")
@@ -123,30 +141,28 @@ public class UserController {
             user.setPassword(null);
             return ResponseEntity.ok(user);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
     @GetMapping("/user/{id}")
     public ResponseEntity<?> getUser(@PathVariable String id, Authentication authentication) {
         try {
-            String checkingEmail = authentication.getPrincipal().toString();
-            UserDto checkingUser = userService.findUserByEmail(checkingEmail);
-            Collection<? extends GrantedAuthority> authorities = authentication.getAuthorities();
+            UserDto checkingUser = userService.findUserByEmail(authentication.getPrincipal().toString());
 
-            UserDto user = new UserDto();
             // check if user's own account or ADMIN or MAIN
-            if (checkingUser.getId().equals(id)
-                    || authorities.stream()
-                            .anyMatch(role -> role.getAuthority().equals(UserRole.MAIN.toString())
-                                    || role.getAuthority().equals(UserRole.ADMIN.toString()))) {
-                user = userService.getUser(id);
+            String matches = UserRole.MAIN.toString() + "|" + UserRole.ADMIN.toString();
+            boolean allowed = authentication.getAuthorities().stream()
+                    .anyMatch(role -> role.getAuthority().matches(matches));
+            if (checkingUser.getId().equals(id) || allowed) {
+                UserDto user = userService.getUser(id);
+                user.setPassword(null);
                 return ResponseEntity.ok(user);
             }
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+            return ResponseEntity.badRequest()
                     .body("You do not have permission to access this page.");
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -154,13 +170,15 @@ public class UserController {
     public ResponseEntity<?> updateUser(
             Authentication authentication,
             @RequestParam(value = "image", required = false) MultipartFile image,
-            @RequestPart(value = "user") UserDto userDto) {
+            @RequestPart(value = "user", required = false) UserDto userDto) {
         try {
             UserDto user = userService.findUserByEmail(authentication.getPrincipal().toString());
-            user.setUsername(userDto.getUsername())
-                    .setBio(userDto.getBio());
+            UserDto result = user;
+            if (userDto != null) {
+                user.setUsername(userDto.getUsername())
+                        .setBio(userDto.getBio());
+            }
 
-            UserDto result = new UserDto();
             if (image != null) {
                 user.setPic(user.getId() + ".jpg");
                 result = userService.updateUser(user);
@@ -169,9 +187,10 @@ public class UserController {
             } else {
                 result = userService.updateUser(user);
             }
+            result.setPassword(null);
             return ResponseEntity.ok(result);
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -181,7 +200,7 @@ public class UserController {
         try {
             return ResponseEntity.ok(userService.changePassword(userDto, passwordDto));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -189,9 +208,52 @@ public class UserController {
     @PreAuthorize("hasAnyAuthority('MAIN', 'ADMIN')")
     public ResponseEntity<?> deleteUser(@PathVariable String id, Authentication authentication) {
         try {
+            UserDto deletingUser = userService.findUserByEmail(authentication.getPrincipal().toString());
+            UserDto user = userService.getUser(id);
+            if (deletingUser.getRole().equals(UserRole.ADMIN.toString())
+                    && user.getRole().equals(UserRole.MAIN.toString())) {
+                return ResponseEntity.badRequest().body("You don't have authority over this account");
+            }
+            deleteImage(user.getId(), authentication);
             return ResponseEntity.ok(userService.deleteUser(id));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @GetMapping(value = "/image/{pp}", produces = MediaType.IMAGE_JPEG_VALUE)
+    public ResponseEntity<?> getImage(@PathVariable String pp) throws IOException {
+        Path image = Paths.get("files/imgs/user-pp/" + pp);
+        if (Files.exists(image)) {
+            byte[] data = Files.readAllBytes(image);
+            ByteArrayResource resource = new ByteArrayResource(data);
+            return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(resource);
+        }
+        return ResponseEntity.notFound().build();
+    }
+
+    @DeleteMapping("/image/delete/{id}")
+    public ResponseEntity<?> deleteImage(@PathVariable String id, Authentication authentication) throws IOException {
+        // Path image = Paths.get("files/imgs/user-pp/" + pp);
+        try {
+            UserDto user = userService.getUser(id);
+
+            // check for admin permissions
+            String matches = UserRole.MAIN.toString() + "|" + UserRole.ADMIN.toString();
+            boolean allowed = authentication.getAuthorities().stream()
+                    .anyMatch(role -> role.getAuthority().matches(matches));
+            if (authentication.getPrincipal().toString().equals(user.getEmail()) ||
+                    allowed) {
+                Path image = Paths.get("files/imgs/user-pp/" + user.getPic());
+                Files.delete(image);
+                user.setPic(null);
+                userService.updateUser(user);
+                return ResponseEntity.ok(true);
+            }
+
+            return ResponseEntity.badRequest().body(false);
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
 
@@ -205,16 +267,5 @@ public class UserController {
                     return ResponseEntity.ok(jwtUtils.generateTokenFromEmail(user.getEmail()));
                 })
                 .orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!"));
-    }
-
-    @GetMapping(value = "/image/{pp}", produces = MediaType.IMAGE_JPEG_VALUE)
-    public ResponseEntity<?> getImage(@PathVariable String pp) throws IOException {
-        Path image = Paths.get("files/imgs/user-pp/" + pp);
-        if (Files.exists(image)) {
-            byte[] data = Files.readAllBytes(image);
-            ByteArrayResource resource = new ByteArrayResource(data);
-            return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(resource);
-        }
-        return ResponseEntity.notFound().build();
     }
 }

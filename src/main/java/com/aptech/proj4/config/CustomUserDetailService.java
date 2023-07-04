@@ -14,6 +14,7 @@ import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
 import com.aptech.proj4.dto.UserDto;
+import com.aptech.proj4.enums.UserRole;
 import com.aptech.proj4.service.UserService;
 
 @Service
@@ -23,11 +24,16 @@ public class CustomUserDetailService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
-        UserDto userDto = userService.findUserByEmail(email);
-        if (userDto != null) {
+        try {
+            UserDto userDto = userService.findUserByEmail(email);
             List<GrantedAuthority> authorities = getUserAuthority(userDto.getRole());
+
+            // stop banned users
+            if (authorities.stream().anyMatch(role -> role.getAuthority().equals(UserRole.BANNED.toString()))) {
+                throw new UsernameNotFoundException("User with this email is banned.");
+            }
             return buildUserForAuthentication(userDto, authorities);
-        } else {
+        } catch (Exception e) {
             throw new UsernameNotFoundException("User with email does not exist.");
         }
     }
