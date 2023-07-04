@@ -3,6 +3,7 @@ package com.aptech.proj4.service;
 import java.util.List;
 
 import com.aptech.proj4.dto.ProjectDto;
+import com.aptech.proj4.dto.TaskDto;
 import com.aptech.proj4.model.Project;
 
 
@@ -16,5 +17,7 @@ public interface ProjectService {
     List<Project> findProjectByName(String name); // use string `files`
 
     ProjectDto updateproject(String id, ProjectDto project);
+
+    ProjectDto getProject(String id);
 
 }

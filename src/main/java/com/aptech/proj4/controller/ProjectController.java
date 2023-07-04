@@ -2,6 +2,7 @@ package com.aptech.proj4.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -45,6 +46,16 @@ public class ProjectController {
         if (deleted) {
             return ResponseEntity.status(HttpStatus.OK).body("Project delete successfully");
         } else {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+  @GetMapping("/get/{id}")
+    public ResponseEntity<?> getProject(@PathVariable("id") String id) {
+        try {
+            ProjectDto project = projectService.getProject(id);
+            return ResponseEntity.ok(project);
+        } catch (Exception e) {
             return ResponseEntity.notFound().build();
         }
     }
