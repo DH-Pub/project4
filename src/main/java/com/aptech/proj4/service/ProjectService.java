@@ -3,7 +3,6 @@ package com.aptech.proj4.service;
 import java.util.List;
 
 import com.aptech.proj4.dto.ProjectDto;
-import com.aptech.proj4.dto.TaskDto;
 import com.aptech.proj4.model.Project;
 
 
