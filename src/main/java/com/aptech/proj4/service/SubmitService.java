@@ -17,4 +17,6 @@ public interface SubmitService {
   String getSubmitFileUrl(String id);
 
   List<Submit> getAllSubmits();
+
+  List<SubmitDto> getAllSubmitByTaskId(String taskId);
 }
