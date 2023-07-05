@@ -69,17 +69,23 @@ public class DocumentController {
     }
   }
 
-  @GetMapping("/{file}")
+  @GetMapping("/{projectId}")
+  public ResponseEntity<List<DocumentDto>> getByProjectId(@PathVariable("projectId") String projectId) {
+    List<DocumentDto> documents = documentService.getDocuments(projectId);
+    return ResponseEntity.ok(documents);
+  }
+
+  @GetMapping("/file/{file}")
   public ResponseEntity<List<Document>> findFileByName(@PathVariable("file") String file) {
     List<Document> document = documentService.findFilesByName(file);
     return ResponseEntity.ok(document);
   }
 
-  @GetMapping
-  public ResponseEntity<List<Document>> getAllDocuments() {
-    List<Document> documents = documentService.getAllDocuments();
-    return ResponseEntity.ok(documents);
-  }
+  // @GetMapping
+  // public ResponseEntity<List<Document>> getAllDocuments() {
+  // List<Document> documents = documentService.getAllDocuments();
+  // return ResponseEntity.ok(documents);
+  // }
 
   @GetMapping("/download/{fileId}")
   public ResponseEntity<Resource> downloadDocument(@PathVariable("fileId") String fileId) {
