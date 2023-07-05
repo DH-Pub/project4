@@ -1,7 +1,9 @@
 package com.aptech.proj4.service;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.io.FileSystemResource;
@@ -55,6 +57,25 @@ public class DocumentServiceImpl implements DocumentService {
       return documents;
     }
     throw new RuntimeException("Document name not found");
+  }
+
+  @Override
+  public List<DocumentDto> getDocuments(String projectId) {
+    List<DocumentDto> documents = new ArrayList<>();
+    List<Document> allDocuments = getAllDocuments();
+
+    for (Document document : allDocuments) {
+      if (document.getProject().getId().equals(projectId)) {
+        DocumentDto documentDto = new DocumentDto()
+            .setId(document.getId())
+            .setDescription(document.getDescription())
+            .setFiles(document.getFiles())
+            .setProject_id(document.getProject().getId())
+            .setCreateAt(document.getCreatedAt());
+        documents.add(documentDto);
+      }
+    }
+    return documents;
   }
 
   @Override

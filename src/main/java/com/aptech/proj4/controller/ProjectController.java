@@ -2,6 +2,7 @@ package com.aptech.proj4.controller;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -49,7 +50,17 @@ public class ProjectController {
         }
     }
 
-    @GetMapping
+  @GetMapping("/get/{id}")
+    public ResponseEntity<?> getProject(@PathVariable("id") String id) {
+        try {
+            ProjectDto project = projectService.getProject(id);
+            return ResponseEntity.ok(project);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/getAll")
     public ResponseEntity<List<ProjectDto>> getAllProjects() {
         List<Project> projects = projectService.getAllProjects();
         List<ProjectDto> dtos = new ArrayList<>();

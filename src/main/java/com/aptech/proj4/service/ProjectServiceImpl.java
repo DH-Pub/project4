@@ -2,12 +2,14 @@ package com.aptech.proj4.service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.aptech.proj4.dto.ProjectDto;
+import com.aptech.proj4.dto.TeamDto;
 import com.aptech.proj4.model.Project;
 import com.aptech.proj4.model.Team;
 import com.aptech.proj4.repository.ProjectRepository;
@@ -89,5 +91,17 @@ public class ProjectServiceImpl implements ProjectService {
         ProjectDto updatedProjectDto = modelMapper.map(updatedProject, ProjectDto.class);
         return updatedProjectDto;
     }
+
+    @Override
+public ProjectDto getProject(String id) {
+    Optional<Project> project = projectRepository.findById(id);
+    if (project.isPresent()) {
+        ProjectDto projectDto = modelMapper.map(project.get(), ProjectDto.class);
+        projectDto.setTeam_id(project.get().getTeam().getId());
+        projectDto.setCreateAt(project.get().getCreatedAt());
+        return projectDto;
+    }
+    throw new RuntimeException("Project does not exist");
+}
 
 }
