@@ -9,7 +9,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.aptech.proj4.dto.MilestoneDto;
-import com.aptech.proj4.dto.ProjectDto;
 import com.aptech.proj4.model.Milestone;
 import com.aptech.proj4.model.Project;
 import com.aptech.proj4.repository.MilestoneRepository;
