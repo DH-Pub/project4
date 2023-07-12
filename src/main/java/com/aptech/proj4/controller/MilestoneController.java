@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aptech.proj4.dto.MilestoneDto;
+import com.aptech.proj4.dto.ProjectDto;
 import com.aptech.proj4.model.Milestone;
 import com.aptech.proj4.service.MilestoneService;
 
@@ -49,7 +50,17 @@ public class MilestoneController {
         }
     }
 
-    @GetMapping
+      @GetMapping("/get/{id}")
+    public ResponseEntity<?> getMilestone(@PathVariable("id") String id) {
+        try {
+            MilestoneDto milestone = milestoneService.getMilestone(id);
+            return ResponseEntity.ok(milestone);
+        } catch (Exception e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @GetMapping("/getAll")
     public ResponseEntity<List<MilestoneDto>> getAllMilestone() {
         List<Milestone> milestones = milestoneService.getAllMilestones();
         List<MilestoneDto> dtos = new ArrayList<>();

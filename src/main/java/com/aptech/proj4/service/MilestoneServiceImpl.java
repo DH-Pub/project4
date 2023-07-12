@@ -2,12 +2,14 @@ package com.aptech.proj4.service;
 
 import java.util.List;
 import java.util.NoSuchElementException;
+import java.util.Optional;
 
 import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.aptech.proj4.dto.MilestoneDto;
+import com.aptech.proj4.dto.ProjectDto;
 import com.aptech.proj4.model.Milestone;
 import com.aptech.proj4.model.Project;
 import com.aptech.proj4.repository.MilestoneRepository;
@@ -87,6 +89,17 @@ public class MilestoneServiceImpl implements MilestoneService {
 
         MilestoneDto updatedMilestoneDto = modelMapper.map(updatedMilestone, MilestoneDto.class);
         return updatedMilestoneDto;
+    }
+
+    @Override
+    public MilestoneDto getMilestone(String id) {
+Optional<Milestone> milestone = milestoneRepository.findById(id);
+    if (milestone.isPresent()) {
+        MilestoneDto milestoneDto = modelMapper.map(milestone.get(), MilestoneDto.class);
+        milestoneDto.setProjects_id(milestone.get().getProject().getId());
+        return milestoneDto;
+    }
+    throw new RuntimeException("Project does not exist");
     }
 
 }
