@@ -142,30 +142,10 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public TaskDto getTaskById(String id, String authentication) {
-        TaskDto taskDto = new TaskDto();
-        // Task task = taskRepository.findById(id).get();
-        // List<String> listStr = new ArrayList<String>();
-        // String[] x = task.getFiles().split(",");
-        // x[0].replace("[", "");
-        // x[x.length - 1].replace("]", "");
-        // for (int i=0; i < x.length; i++) {
-        // listStr.add(x[i]);
-        // }
-        // taskDto.setId(task.getId())
-        // .setTaskName(task.getTaskName())
-        // .setDescription(task.getDescription())
-        // .setBrief(task.getBrief())
-        // .setPriority(task.getPriority())
-        // .setCategory(task.getCategory())
-        // .setEstimated(task.getEstimated())
-        // .setDueDate(task.getDueDate())
-        // .setFiles(listStr)
-        // .setStatus(task.getStatus())
-        // .setMilestone(task.getMilestone())
-        // .setPosition(task.getPosition())
-        // .setUsers(task.getUsers());
-        return taskDto;
+    public List<Task> getTaskByUser(String id) {
+        User user = userRepository.findById(id).get();
+        List<Task> listTask = (List<Task>) taskRepository.findByUser(user);
+        return listTask;
     }
 
     @Override
