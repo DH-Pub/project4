@@ -260,12 +260,17 @@ public class UserController {
     @PostMapping("/refreshtoken")
     public ResponseEntity<?> refreshToken(@Valid @RequestBody TokenRefreshDto req) {
         String requestRefreshToken = req.getRefreshToken();
-        return refreshTokenService.findByToken(requestRefreshToken)
-                .map(refreshTokenService::verifyExpiration)
-                .map(RefreshToken::getUser)
-                .map(user -> {
-                    return ResponseEntity.ok(jwtUtils.generateTokenFromEmail(user.getEmail()));
-                })
-                .orElseThrow(() -> new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!"));
+        try {
+            return refreshTokenService.findByToken(requestRefreshToken)
+                    .map(refreshTokenService::verifyExpiration)
+                    .map(RefreshToken::getUser)
+                    .map(user -> {
+                        return ResponseEntity.ok(jwtUtils.generateTokenFromEmail(user.getEmail()));
+                    })
+                    .orElseThrow(
+                            () -> new TokenRefreshException(requestRefreshToken, "Refresh token is not in database!"));
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
     }
 }
