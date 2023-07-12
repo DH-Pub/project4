@@ -55,8 +55,8 @@ public class TaskController {
         }
     }
 
-    @GetMapping("/{projectId}")
-    ResponseEntity<?> getTasksByProject(@PathVariable("projectId") String projectId) {
+    @GetMapping
+    ResponseEntity<?> getTasksByProject(@RequestParam("projectId") String projectId) {
         try {
             return ResponseEntity.ok(taskService.getTasksByProject(projectId));
         } catch (Exception ex) {
@@ -70,6 +70,15 @@ public class TaskController {
             return ResponseEntity.ok(taskService.getTaskById(id, authentication.getPrincipal().toString()));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/update")
+    ResponseEntity<?> updateTask(@RequestBody TaskDto taskDto) {
+        try {
+            return ResponseEntity.ok(taskService.updateTask(taskDto));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 }

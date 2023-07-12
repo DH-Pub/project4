@@ -11,6 +11,7 @@ import java.util.HashSet;
 import java.util.Random;
 import java.util.Set;
 
+import org.modelmapper.ModelMapper;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
@@ -45,6 +46,8 @@ public class TaskServiceImpl implements TaskService {
     ProjectRepository projectRepository;
     @Autowired
     SubmitService submitService;
+    @Autowired
+    private ModelMapper modelMapper;
 
     @Override
     public boolean createTask(MultipartFile[] files, TaskDto taskDto, String creatingUser) {
@@ -92,7 +95,7 @@ public class TaskServiceImpl implements TaskService {
                 .setParentTask(taskDto.getParentTask());
         if (taskRepository.save(task) != null) { // If save task successfully
             /* save data into assignees table */
-                User assigneeUser = userRepository.findById(taskDto.getUser()).get();
+                User assigneeUser = userRepository.findById(taskDto.getUser().getId()).get();
                 if (assigneeUser != null) {
                     Assignee assignee = new Assignee();
                     assignee.setTask(task);
@@ -165,5 +168,11 @@ public class TaskServiceImpl implements TaskService {
         return taskDto;
     }
 
+    @Override
+    public TaskDto updateTask(TaskDto taskDto) {
+        Task updatedTask = modelMapper.map(taskDto, Task.class);
+        taskRepository.save(updatedTask);
+        return taskDto;
+    }
 
 }
