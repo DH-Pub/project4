@@ -5,15 +5,19 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.core.Authentication;
 import com.aptech.proj4.dto.TaskDto;
 import com.aptech.proj4.service.TaskService;
+
+import jakarta.annotation.Generated;
 
 @RestController
 @RequestMapping("/task")
@@ -51,12 +55,30 @@ public class TaskController {
         }
     }
 
+    @GetMapping
+    ResponseEntity<?> getTasksByProject(@RequestParam("projectId") String projectId) {
+        try {
+            return ResponseEntity.ok(taskService.getTasksByProject(projectId));
+        } catch (Exception ex) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
+
     @PostMapping("/getById")
     ResponseEntity<?> getTaskById(@RequestBody String id, Authentication authentication) {
         try {
             return ResponseEntity.ok(taskService.getTaskById(id, authentication.getPrincipal().toString()));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
+        }
+    }
+
+    @PostMapping("/update")
+    ResponseEntity<?> updateTask(@RequestBody TaskDto taskDto) {
+        try {
+            return ResponseEntity.ok(taskService.updateTask(taskDto));
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(e.getMessage());
         }
     }
 }

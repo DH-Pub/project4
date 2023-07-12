@@ -68,9 +68,15 @@ public class SubmitController {
     }
   }
 
-  @GetMapping
-  public ResponseEntity<List<Submit>> getAllDocuments() {
-    List<Submit> submits = submitService.getAllSubmits();
+  // @GetMapping
+  // public ResponseEntity<List<Submit>> getAllDocuments() {
+  // List<Submit> submits = submitService.getAllSubmits();
+  // return ResponseEntity.ok(submits);
+  // }
+
+  @GetMapping("/{taskId}")
+  public ResponseEntity<List<SubmitDto>> getByTaskid(@PathVariable("taskId") String taskId) {
+    List<SubmitDto> submits = submitService.getAllSubmitByTaskId(taskId);
     return ResponseEntity.ok(submits);
   }
 
