@@ -1,5 +1,6 @@
 package com.aptech.proj4.service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +79,25 @@ public class SubmitServiceImpl implements SubmitService {
   @Override
   public List<Submit> getAllSubmits() {
     List<Submit> submits = (List<Submit>) submitRepository.findAll();
+    return submits;
+  }
+
+  @Override
+  public List<SubmitDto> getAllSubmitByTaskId(String taskId) {
+    List<SubmitDto> submits = new ArrayList<>();
+    List<Submit> allSubmits = getAllSubmits();
+
+    for (Submit submit : allSubmits) {
+      if (submit.getTaskId().getId().equals(taskId)) {
+        SubmitDto submitDto = new SubmitDto()
+            .setId(submit.getId())
+            .setTaskId(submit.getTaskId().getId())
+            .setNote(submit.getNote())
+            .setAttached(submit.getAttached())
+            .setSubmittedAt(submit.getSubmittedAt());
+        submits.add(submitDto);
+      }
+    }
     return submits;
   }
 

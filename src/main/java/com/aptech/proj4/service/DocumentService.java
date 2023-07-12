@@ -15,6 +15,8 @@ public interface DocumentService {
 
     List<Document> findFilesByName(String file); // use string `files`
 
+    List<DocumentDto> getDocuments(String projectId);
+
     List<Document> getAllDocuments();
 
     Resource loadDocumentFile(String fileId); // get Document from resource
