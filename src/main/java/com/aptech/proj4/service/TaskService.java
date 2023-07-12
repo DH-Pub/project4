@@ -11,4 +11,6 @@ public interface TaskService {
     boolean createTask(MultipartFile[] files, TaskDto task, String creatingUser);
     List<Task> getAllTasks();
     TaskDto getTaskById(String id, String authentication);
+    List<Task> getTasksByProject(String projectId);
+    TaskDto updateTask(TaskDto task);
 }
