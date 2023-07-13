@@ -5,6 +5,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -61,10 +62,10 @@ public class TaskController {
         }
     }
 
-    @PostMapping("/getById")
-    ResponseEntity<?> getTaskById(@RequestBody String id, Authentication authentication) {
+    @GetMapping("/{id}")
+    ResponseEntity<?> getTaskById(@PathVariable String id) {
         try {
-            return ResponseEntity.ok(taskService.getTaskById(id, authentication.getPrincipal().toString()));
+            return ResponseEntity.ok(taskService.getTaskByUser(id));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }

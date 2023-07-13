@@ -36,7 +36,8 @@ public class ProjectServiceImpl implements ProjectService {
                 .setName(projectDto.getName())
                 .setTeam(team);
 
-        projectRepository.save(project);
+        Project result = projectRepository.save(project);
+        projectDto.setId(result.getId()).setCreateAt(result.getCreatedAt());
         return projectDto;
     }
 
@@ -92,15 +93,15 @@ public class ProjectServiceImpl implements ProjectService {
     }
 
     @Override
-public ProjectDto getProject(String id) {
-    Optional<Project> project = projectRepository.findById(id);
-    if (project.isPresent()) {
-        ProjectDto projectDto = modelMapper.map(project.get(), ProjectDto.class);
-        projectDto.setTeam_id(project.get().getTeam().getId());
-        projectDto.setCreateAt(project.get().getCreatedAt());
-        return projectDto;
+    public ProjectDto getProject(String id) {
+        Optional<Project> project = projectRepository.findById(id);
+        if (project.isPresent()) {
+            ProjectDto projectDto = modelMapper.map(project.get(), ProjectDto.class);
+            projectDto.setTeam_id(project.get().getTeam().getId());
+            projectDto.setCreateAt(project.get().getCreatedAt());
+            return projectDto;
+        }
+        throw new RuntimeException("Project does not exist");
     }
-    throw new RuntimeException("Project does not exist");
-}
 
 }
