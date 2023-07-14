@@ -17,6 +17,7 @@ public interface SecurityConstants {
             "/auth/signup",
             "/auth/refreshtoken",
             "auth/image/**",
+            "/document/dowload/**",
     };
 
     String MAIN_EMAIL = "main@email.com";

@@ -21,6 +21,7 @@ public class AppConfiguration {
                 .setSourceNamingConvention(NamingConventions.JAVABEANS_MUTATOR);
         return modelMapper;
     }
+
     @Bean
     public OpenAPI customOpenAPI() {
         return new OpenAPI()
@@ -29,6 +30,7 @@ public class AppConfiguration {
                                 new SecurityScheme().type(SecurityScheme.Type.HTTP).scheme("bearer")
                                         .bearerFormat("JWT")));
     }
+
     @Bean
     public PasswordEncoder passwordEncoder() {
         return new BCryptPasswordEncoder();
