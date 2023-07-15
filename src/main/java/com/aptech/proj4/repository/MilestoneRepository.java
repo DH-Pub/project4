@@ -8,4 +8,5 @@ import com.aptech.proj4.model.Milestone;
 
 public interface MilestoneRepository extends CrudRepository<Milestone, String>{
     List<Milestone> findByName(String name);
+    List<Milestone> findByProjectId(String projectId);
 }

@@ -22,4 +22,5 @@ public interface MilestoneService {
 
     MilestoneDto getMilestone(String id);
 
+    List<Milestone> findMilestonesByProjectId(String projectId);
 }
