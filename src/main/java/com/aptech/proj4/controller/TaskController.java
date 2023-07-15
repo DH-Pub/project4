@@ -17,8 +17,6 @@ import org.springframework.security.core.Authentication;
 import com.aptech.proj4.dto.TaskDto;
 import com.aptech.proj4.service.TaskService;
 
-import jakarta.annotation.Generated;
-
 @RestController
 @RequestMapping("/task")
 public class TaskController {
@@ -64,10 +62,10 @@ public class TaskController {
         }
     }
 
-    @PostMapping("/getById")
-    ResponseEntity<?> getTaskById(@RequestBody String id, Authentication authentication) {
+    @GetMapping("/{id}")
+    ResponseEntity<?> getTaskById(@PathVariable String id) {
         try {
-            return ResponseEntity.ok(taskService.getTaskById(id, authentication.getPrincipal().toString()));
+            return ResponseEntity.ok(taskService.getTaskByUser(id));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }
