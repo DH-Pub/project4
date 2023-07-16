@@ -1,6 +1,7 @@
 package com.aptech.proj4.service;
 
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 import java.util.NoSuchElementException;
@@ -81,4 +82,22 @@ public class CommentServiceImpl implements CommentService {
     return comments;
   }
 
+  @Override
+  public List<CommentDto> getAllCommentByTaskId(String taskId) {
+    List<CommentDto> comments = new ArrayList<>();
+    List<Comment> allComments = getAllComments();
+
+    for (Comment comment : allComments) {
+      if (comment.getTaskId().getId().equals(taskId)) {
+        CommentDto commentDto = new CommentDto()
+            .setId(comment.getId())
+            .setTaskId(comment.getTaskId().getId())
+            .setComment(comment.getComment())
+            .setCreatedBy(comment.getCreatedBy().getId())
+            .setCreateAt(comment.getCreatedAt());
+        comments.add(commentDto);
+      }
+    }
+    return comments;
+  }
 }

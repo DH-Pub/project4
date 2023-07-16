@@ -50,8 +50,4 @@ public class Comment implements Serializable {
   @CreationTimestamp
   @Column(name = "created_at", columnDefinition = "DATETIME")
   private String createdAt;
-
-  @UpdateTimestamp
-  @Column(name = "modified_at", columnDefinition = "DATETIME")
-  private String modifiedAt;
 }

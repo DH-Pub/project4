@@ -13,4 +13,6 @@ public interface CommentService {
   CommentDto updateComment(String id, CommentDto comment);
 
   List<Comment> getAllComments();
+
+  List<CommentDto> getAllCommentByTaskId(String taskId);
 }

@@ -51,9 +51,15 @@ public class CommentController {
     }
   }
 
-  @GetMapping
-  public ResponseEntity<List<Comment>> getAllComments() {
-    List<Comment> comments = commentService.getAllComments();
+  // @GetMapping
+  // public ResponseEntity<List<Comment>> getAllComments() {
+  // List<Comment> comments = commentService.getAllComments();
+  // return ResponseEntity.ok(comments);
+  // }
+  @GetMapping("/{taskId}")
+  public ResponseEntity<List<CommentDto>> getByTaskId(
+      @PathVariable("taskId") String taskId) {
+    List<CommentDto> comments = commentService.getAllCommentByTaskId(taskId);
     return ResponseEntity.ok(comments);
   }
 }
