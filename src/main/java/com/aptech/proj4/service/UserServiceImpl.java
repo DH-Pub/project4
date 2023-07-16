@@ -51,11 +51,12 @@ public class UserServiceImpl implements UserService {
 
     @Override
     public UserDto findUserByEmail(String email) {
-        Optional<User> user = Optional.ofNullable(userRepository.findByEmail(email).get());
+        Optional<User> user = userRepository.findByEmail(email);
         if (user.isPresent()) {
             return modelMapper.map(user.get(), UserDto.class);
+        } else {
+            throw new RuntimeException("user does not exist");
         }
-        return null;
     }
 
     @Override

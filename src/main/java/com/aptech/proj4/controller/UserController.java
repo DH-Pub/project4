@@ -148,19 +148,9 @@ public class UserController {
     @GetMapping("/user/{id}")
     public ResponseEntity<?> getUser(@PathVariable String id, Authentication authentication) {
         try {
-            UserDto checkingUser = userService.findUserByEmail(authentication.getPrincipal().toString());
-
-            // check if user's own account or ADMIN or MAIN
-            String matches = UserRole.MAIN.toString() + "|" + UserRole.ADMIN.toString();
-            boolean allowed = authentication.getAuthorities().stream()
-                    .anyMatch(role -> role.getAuthority().matches(matches));
-            if (checkingUser.getId().equals(id) || allowed) {
-                UserDto user = userService.getUser(id);
-                user.setPassword(null);
-                return ResponseEntity.ok(user);
-            }
-            return ResponseEntity.badRequest()
-                    .body("You do not have permission to access this page.");
+            UserDto user = userService.getUser(id);
+            user.setPassword(null);
+            return ResponseEntity.ok(user);
         } catch (Exception e) {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
