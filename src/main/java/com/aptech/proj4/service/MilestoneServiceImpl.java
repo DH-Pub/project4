@@ -101,4 +101,14 @@ Optional<Milestone> milestone = milestoneRepository.findById(id);
     throw new RuntimeException("Project does not exist");
     }
 
+    @Override
+    public List<Milestone> findMilestonesByProjectId(String projectId) {
+        List<Milestone> milestones = milestoneRepository.findByProjectId(projectId);
+
+    if (!milestones.isEmpty()) {
+        return milestones;
+    }
+    throw new MilestoneNotFoundException(projectId);
+    }
+
 }
