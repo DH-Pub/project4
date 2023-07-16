@@ -68,7 +68,6 @@ public class CommentServiceImpl implements CommentService {
         .orElseThrow(() -> new NoSuchElementException("Comment ID not found"));
 
     existingComment.setComment(commentDto.getComment());
-    existingComment.setModifiedAt(new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date()));
 
     Comment updatedComment = commentRepository.save(existingComment);
 
