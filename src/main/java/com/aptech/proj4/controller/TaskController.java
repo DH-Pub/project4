@@ -14,6 +14,8 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 import org.springframework.security.core.Authentication;
+
+import com.aptech.proj4.dto.GetMyTasksDto;
 import com.aptech.proj4.dto.TaskDto;
 import com.aptech.proj4.service.TaskService;
 
@@ -53,7 +55,7 @@ public class TaskController {
         }
     }
 
-    @GetMapping
+    @GetMapping()
     ResponseEntity<?> getTasksByProject(@RequestParam("projectId") String projectId) {
         try {
             return ResponseEntity.ok(taskService.getTasksByProject(projectId));
@@ -62,10 +64,11 @@ public class TaskController {
         }
     }
 
-    @GetMapping("/{id}")
-    ResponseEntity<?> getTaskById(@PathVariable String id) {
+
+    @GetMapping("/myTasks")
+    ResponseEntity<?> getTaskById(@RequestParam("projectId") String projectId, @RequestParam("userId") String userId) {
         try {
-            return ResponseEntity.ok(taskService.getTaskByUser(id));
+            return ResponseEntity.ok(taskService.getTaskByUser(userId, projectId));
         } catch (Exception ex) {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).body(ex.getMessage());
         }

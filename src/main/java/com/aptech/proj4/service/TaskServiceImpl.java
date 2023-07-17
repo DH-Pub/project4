@@ -17,6 +17,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.StringUtils;
 import org.springframework.web.multipart.MultipartFile;
 
+import com.aptech.proj4.dto.GetMyTasksDto;
 import com.aptech.proj4.dto.SubmitDto;
 import com.aptech.proj4.dto.TaskDto;
 import com.aptech.proj4.model.Assignee;
@@ -142,10 +143,11 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> getTaskByUser(String id) {
-        User user = userRepository.findById(id).get();
+    public List<Task> getTaskByUser(String userId, String projectId) {
+        User user = userRepository.findById(userId).get();
         List<Task> listTask = (List<Task>) taskRepository.findByUser(user);
-        return listTask;
+        List<Task> returnLstTasks = listTask.stream().filter(task -> task.getProject().getId().equals(projectId)).toList();
+        return returnLstTasks;
     }
 
     @Override
