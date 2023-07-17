@@ -1,4 +1,4 @@
-package com.aptech.proj4.service;
+package com.aptech.proj4.exception;
 
 public class MilestoneNotFoundException extends RuntimeException {
     public MilestoneNotFoundException(String projectId) {

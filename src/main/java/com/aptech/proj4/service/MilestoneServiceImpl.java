@@ -9,6 +9,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import com.aptech.proj4.dto.MilestoneDto;
+import com.aptech.proj4.exception.MilestoneNotFoundException;
 import com.aptech.proj4.model.Milestone;
 import com.aptech.proj4.model.Project;
 import com.aptech.proj4.repository.MilestoneRepository;
@@ -79,10 +80,10 @@ public class MilestoneServiceImpl implements MilestoneService {
         Milestone existingMilestone = milestoneRepository.findById(id)
                 .orElseThrow(() -> new NoSuchElementException("Milestone ID not found"));
 
-                existingMilestone.setName(milestoneDto.getName());
-                existingMilestone.setDescription(milestoneDto.getDescription());
-                existingMilestone.setFrom(milestoneDto.getFrom());
-                existingMilestone.setTo(milestoneDto.getTo());
+        existingMilestone.setName(milestoneDto.getName());
+        existingMilestone.setDescription(milestoneDto.getDescription());
+        existingMilestone.setFrom(milestoneDto.getFrom());
+        existingMilestone.setTo(milestoneDto.getTo());
 
         Milestone updatedMilestone = milestoneRepository.save(existingMilestone);
 
@@ -92,23 +93,23 @@ public class MilestoneServiceImpl implements MilestoneService {
 
     @Override
     public MilestoneDto getMilestone(String id) {
-Optional<Milestone> milestone = milestoneRepository.findById(id);
-    if (milestone.isPresent()) {
-        MilestoneDto milestoneDto = modelMapper.map(milestone.get(), MilestoneDto.class);
-        milestoneDto.setProjects_id(milestone.get().getProject().getId());
-        return milestoneDto;
-    }
-    throw new RuntimeException("Project does not exist");
+        Optional<Milestone> milestone = milestoneRepository.findById(id);
+        if (milestone.isPresent()) {
+            MilestoneDto milestoneDto = modelMapper.map(milestone.get(), MilestoneDto.class);
+            milestoneDto.setProjects_id(milestone.get().getProject().getId());
+            return milestoneDto;
+        }
+        throw new RuntimeException("Project does not exist");
     }
 
     @Override
     public List<Milestone> findMilestonesByProjectId(String projectId) {
         List<Milestone> milestones = milestoneRepository.findByProjectId(projectId);
 
-    if (!milestones.isEmpty()) {
-        return milestones;
-    }
-    throw new MilestoneNotFoundException(projectId);
+        if (!milestones.isEmpty()) {
+            return milestones;
+        }
+        throw new MilestoneNotFoundException(projectId);
     }
 
 }
