@@ -13,6 +13,7 @@ import org.springframework.web.bind.annotation.PutMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aptech.proj4.dto.CommentDto;
@@ -26,8 +27,10 @@ public class CommentController {
   private CommentService commentService;
 
   @PostMapping("/create")
-  public ResponseEntity<?> createdComment(@RequestBody() CommentDto commentDto, @RequestParam String taskId,
-      @RequestParam String userId) {
+  public ResponseEntity<?> createdComment(
+      @RequestPart(value = "comment", required = true) CommentDto commentDto,
+      @RequestPart(value = "taskId") String taskId,
+      @RequestPart(value = "userId") String userId) {
     CommentDto savedComment = commentService.createComment(commentDto, taskId, userId);
     return ResponseEntity.ok(savedComment);
   }
