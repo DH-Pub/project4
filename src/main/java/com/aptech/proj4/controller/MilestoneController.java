@@ -17,10 +17,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aptech.proj4.dto.MilestoneDto;
-import com.aptech.proj4.dto.ProjectDto;
+import com.aptech.proj4.exception.MilestoneNotFoundException;
 import com.aptech.proj4.model.ErrorResponse;
 import com.aptech.proj4.model.Milestone;
-import com.aptech.proj4.service.MilestoneNotFoundException;
 import com.aptech.proj4.service.MilestoneService;
 
 @RestController
@@ -105,25 +104,25 @@ public class MilestoneController {
     }
 
     @GetMapping("/findByProject/{projectId}")
-public ResponseEntity<?> findMilestonesByProjectId(@PathVariable("projectId") String projectId) {
-    try {
-        List<Milestone> milestones = milestoneService.findMilestonesByProjectId(projectId);
+    public ResponseEntity<?> findMilestonesByProjectId(@PathVariable("projectId") String projectId) {
+        try {
+            List<Milestone> milestones = milestoneService.findMilestonesByProjectId(projectId);
 
-        List<MilestoneDto> dtos = new ArrayList<>();
-        for (Milestone mil : milestones) {
-            MilestoneDto dto = new MilestoneDto();
-            dto.setId(mil.getId()).setName(mil.getName()).setDescription(mil.getDescription()).setFrom(mil.getFrom())
-                .setTo(mil.getTo())
-                .setProjects_id(mil.getProject().getId());
-            dtos.add(dto);
+            List<MilestoneDto> dtos = new ArrayList<>();
+            for (Milestone mil : milestones) {
+                MilestoneDto dto = new MilestoneDto();
+                dto.setId(mil.getId()).setName(mil.getName()).setDescription(mil.getDescription())
+                        .setFrom(mil.getFrom())
+                        .setTo(mil.getTo())
+                        .setProjects_id(mil.getProject().getId());
+                dtos.add(dto);
+            }
+
+            return ResponseEntity.ok(dtos);
+        } catch (MilestoneNotFoundException e) {
+            ErrorResponse errorResponse = new ErrorResponse(e.getMessage());
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
         }
-
-        return ResponseEntity.ok(dtos);
-    } catch (MilestoneNotFoundException e) {
-        ErrorResponse errorResponse = new ErrorResponse(e.getMessage());
-        return ResponseEntity.status(HttpStatus.NOT_FOUND).body(errorResponse);
     }
-}
-
 
 }

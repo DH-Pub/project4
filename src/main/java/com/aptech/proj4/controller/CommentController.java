@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestPart;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.aptech.proj4.dto.CommentDto;
-import com.aptech.proj4.model.Comment;
 import com.aptech.proj4.service.CommentService;
 
 @RestController

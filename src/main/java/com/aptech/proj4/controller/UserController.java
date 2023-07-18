@@ -263,4 +263,39 @@ public class UserController {
             return ResponseEntity.badRequest().body(e.getMessage());
         }
     }
+
+    @DeleteMapping("/refreshtoken/clear/{userId}")
+    public ResponseEntity<?> clearUserRefreshToken(@PathVariable String userId, Authentication authentication) {
+        try {
+            UserDto deletingUser = userService.findUserByEmail(authentication.getPrincipal().toString());
+
+            // check for admin permissions
+            String matches = UserRole.MAIN.toString() + "|" + UserRole.ADMIN.toString();
+            boolean allowed = authentication.getAuthorities().stream()
+                    .anyMatch(role -> role.getAuthority().matches(matches));
+            boolean hasAuth = deletingUser.getId() == userId || allowed;
+            if (hasAuth) {
+                return ResponseEntity.ok(refreshTokenService.clearUserRefreshToken(userId));
+            }
+            return ResponseEntity.badRequest().body("You don't have authority!");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @DeleteMapping("/refreshtoken/clear-all")
+    public ResponseEntity<?> deleteAllRefreshTokens(Authentication authentication) {
+        try {
+            // check for admin permissions
+            String matches = UserRole.MAIN.toString() + "|" + UserRole.ADMIN.toString();
+            boolean allowed = authentication.getAuthorities().stream()
+                    .anyMatch(role -> role.getAuthority().matches(matches));
+            if (allowed) {
+                return ResponseEntity.ok(refreshTokenService.deleteAllRefreshTokens());
+            }
+            return ResponseEntity.badRequest().body("You don't have authority!");
+        } catch (Exception e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
 }

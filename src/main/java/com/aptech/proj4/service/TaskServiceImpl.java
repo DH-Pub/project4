@@ -142,10 +142,11 @@ public class TaskServiceImpl implements TaskService {
     }
 
     @Override
-    public List<Task> getTaskByUser(String id) {
-        User user = userRepository.findById(id).get();
+    public List<Task> getTaskByUser(String userId, String projectId) {
+        User user = userRepository.findById(userId).get();
         List<Task> listTask = (List<Task>) taskRepository.findByUser(user);
-        return listTask;
+        List<Task> returnLstTasks = listTask.stream().filter(task -> task.getProject().getId().equals(projectId)).toList();
+        return returnLstTasks;
     }
 
     @Override

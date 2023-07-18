@@ -52,4 +52,16 @@ public class RefreshTokenServiceImpl implements RefreshTokenService {
             super(String.format("Failed for [%s]: %s", token, message));
         }
     }
+
+    @Override
+    public boolean clearUserRefreshToken(String userId) {
+        refreshTokenRepository.clearUserRefreshToken(userId);
+        return true;
+    }
+
+    @Override
+    public boolean deleteAllRefreshTokens() {
+        refreshTokenRepository.deleteAll();
+        return true;
+    }
 }
